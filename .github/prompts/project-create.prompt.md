@@ -104,7 +104,58 @@ Dans le chat Copilot, **mentionner ce prompt** suivi de votre instruction :
 
 ## 📥 Input requis
 
-Le brief projet doit être fourni en contexte. Si le brief est **incomplet ou ambigu**, utiliser le **système de clarifications** (voir section dédiée) avant de générer les documents.
+### Fichier brief
+
+Le brief projet doit être fourni via un fichier à la racine du workspace :
+
+| Fichier recherché (par ordre de priorité)                       |
+| --------------------------------------------------------------- |
+| `brief.md`                                                      |
+| `BRIEF.md`                                                      |
+| `project-brief.md`                                              |
+| `README.md` (si contient une section `## Brief` ou `## Projet`) |
+
+**Si aucun fichier brief n'est trouvé** :
+
+1. L'agent affiche un message demandant de créer le fichier
+2. L'agent propose un template de brief à compléter
+3. L'agent STOPPE l'exécution
+
+### Template de brief suggéré
+
+Si le brief n'existe pas, proposer ce template à l'utilisateur :
+
+```markdown
+# Brief Projet : [Nom du projet]
+
+## Contexte
+
+<!-- Décrivez le contexte métier et le problème à résoudre -->
+
+## Objectifs
+
+<!-- Quels sont les objectifs principaux du projet ? -->
+
+## Utilisateurs cibles
+
+<!-- Qui sont les utilisateurs ? Quels sont leurs besoins ? -->
+
+## Fonctionnalités principales
+
+<!-- Listez les fonctionnalités attendues (MVP) -->
+
+## Contraintes
+
+<!-- Contraintes techniques, budget, délais, etc. -->
+
+## Stack technique (si connue)
+
+<!-- Technologies imposées ou préférées -->
+```
+
+### Brief incomplet ou ambigu
+
+Si le brief existe mais est **incomplet ou ambigu**, utiliser le **système de clarifications** (voir section dédiée) avant de générer les documents.
 
 ### Points nécessitant potentiellement clarification
 
@@ -161,7 +212,7 @@ Le brief mentionne "stocker des données utilisateur" mais ne précise pas :
 - [ ] **A) SQL (PostgreSQL)** — Relations complexes, transactions ACID, requêtes SQL avancées
 - [ ] **B) NoSQL Document (MongoDB)** — Schéma flexible, scalabilité horizontale, JSON natif
 - [ ] **C) NoSQL Clé-Valeur (Redis)** — Cache, sessions, données éphémères haute performance
-- [ ] **D) Autre** : ****************\_****************
+- [ ] **D) Autre** : ******\*\*\*\*******\_******\*\*\*\*******
 - [ ] **E) Laisser l'IA décider et justifier son choix**
 
 ## Question 2 : Quelle est la volumétrie attendue ?
@@ -169,7 +220,7 @@ Le brief mentionne "stocker des données utilisateur" mais ne précise pas :
 - [ ] **A) Petite** — < 10 000 utilisateurs, < 1 Go de données
 - [ ] **B) Moyenne** — 10 000 - 100 000 utilisateurs, 1-50 Go
 - [ ] **C) Grande** — > 100 000 utilisateurs, > 50 Go
-- [ ] **D) Autre** : ****************\_****************
+- [ ] **D) Autre** : ******\*\*\*\*******\_******\*\*\*\*******
 - [ ] **E) Laisser l'IA décider et justifier son choix**
 
 ---
@@ -383,6 +434,12 @@ une base relationnelle est plus adaptée. PostgreSQL offre :
 ### Avant chaque exécution
 
 ```
+0. RECHERCHER le fichier brief :
+   → Chercher dans l'ordre : brief.md, BRIEF.md, project-brief.md, README.md
+   → SI aucun fichier trouvé :
+      - Afficher le message d'erreur avec template suggéré
+      - STOPPER l'exécution
+   → SI fichier trouvé mais vide : traiter comme "non trouvé"
 1. LIRE /docs/.doc-status.json (ou créer si inexistant)
 2. VÉRIFIER les clarifications en attente :
    → LIRE tous les fichiers dans /clarifications/ avec status "ouvert"
@@ -1410,7 +1467,8 @@ flowchart TD
 
 | Situation | Comportement de l'agent |
 |-----------|------------------------|
-| **Brief absent ou vide** | Demander à l'utilisateur de fournir un brief. NE PAS générer de documents. |
+| **Brief non trouvé** | Afficher le template de brief suggéré et STOPPER. |
+| **Brief vide** | Traiter comme "non trouvé" : afficher template et STOPPER. |
 | **Brief incomplet ou ambigu** | Créer une clarification dans `/clarifications/` et STOPPER. |
 | **Clarification en attente** | Rappeler le fichier à compléter et STOPPER. |
 | **Clarification sans réponse** | Afficher les questions non répondues et STOPPER. |
@@ -1432,6 +1490,33 @@ Action : [Ce que l'utilisateur doit faire]
 ```
 
 ### Exemples
+
+```
+
+📄 BRIEF NON TROUVÉ
+Recherché : brief.md, BRIEF.md, project-brief.md, README.md
+Action : Créez un fichier brief.md à la racine du projet avec le template ci-dessous
+
+┌─────────────────────────────────────────────────────────────┐
+│ # Brief Projet : [Nom du projet] │
+│ │
+│ ## Contexte │
+│ <!-- Décrivez le contexte métier --> │
+│ │
+│ ## Objectifs │
+│ <!-- Quels sont les objectifs ? --> │
+│ │
+│ ## Utilisateurs cibles │
+│ <!-- Qui sont les utilisateurs ? --> │
+│ │
+│ ## Fonctionnalités principales │
+│ <!-- Listez les fonctionnalités MVP --> │
+│ │
+│ ## Contraintes │
+│ <!-- Contraintes techniques, budget, délais --> │
+└─────────────────────────────────────────────────────────────┘
+
+```
 
 ```
 
@@ -1461,6 +1546,7 @@ Action : Complétez toutes les questions puis relancez le prompt
 
 | Situation | `next` | `generate [ID]` | `update [ID]` | `all` |
 |-----------|--------|-----------------|---------------|-------|
+| Brief non trouvé | 📄 Stopper | 📄 Stopper | 📄 Stopper | 📄 Stopper |
 | Fichier inexistant | ✅ Créer | ✅ Créer | ❌ Erreur | ✅ Créer |
 | Fichier `done` | ⏭️ Skip | 🔄 Régénérer | 📝 Merge | ⏭️ Skip |
 | Fichier `outdated` | 🔄 Régénérer | 🔄 Régénérer | 📝 Merge | 🔄 Régénérer |
