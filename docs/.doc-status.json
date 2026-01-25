@@ -3,7 +3,7 @@
   "brief_source": "input/brief.md",
   "brief_modified_at": "2026-01-25T11:35:09.9463453Z",
   "created_at": "2026-01-25T11:38:24.4310419Z",
-  "updated_at": "2026-01-25T12:55:33.9305374Z",
+  "updated_at": "2026-01-25T13:02:58Z",
   "documents": {
     "00-vision": {
       "status": "done",
@@ -38,8 +38,10 @@
       ]
     },
     "04-decisions-architectures": {
-      "status": "pending",
-      "version": 0,
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T13:02:58Z",
+      "lines": 237,
       "depends_on": ["03-specifications-fonctionnelles"]
     },
     "05-specifications-techniques": {

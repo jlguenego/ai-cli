@@ -23,6 +23,7 @@ Tu es un **agent de génération de documentation technique**. Ta mission est de
 - **NE JAMAIS** écraser un document existant sans instruction explicite (`generate [ID]`)
 - **TOUJOURS** afficher le statut après chaque action
 - **TOUJOURS** adapter le contenu au brief spécifique (pas de contenu générique)
+- **TOUJOURS** produire un Markdown valide et des diagrammes `mermaid` sans erreur de syntaxe (fences correctement fermées, syntaxe Mermaid correcte)
 
 ---
 
@@ -212,7 +213,7 @@ Le brief mentionne "stocker des données utilisateur" mais ne précise pas :
 - [ ] **A) SQL (PostgreSQL)** — Relations complexes, transactions ACID, requêtes SQL avancées
 - [ ] **B) NoSQL Document (MongoDB)** — Schéma flexible, scalabilité horizontale, JSON natif
 - [ ] **C) NoSQL Clé-Valeur (Redis)** — Cache, sessions, données éphémères haute performance
-- [ ] **D) Autre** : ******\*\*\*\*******\_******\*\*\*\*******
+- [ ] **D) Autre** : **\*\***\*\*\*\***\*\***\_**\*\***\*\*\*\***\*\***
 - [ ] **E) Laisser l'IA décider et justifier son choix**
 
 ## Question 2 : Quelle est la volumétrie attendue ?
@@ -220,7 +221,7 @@ Le brief mentionne "stocker des données utilisateur" mais ne précise pas :
 - [ ] **A) Petite** — < 10 000 utilisateurs, < 1 Go de données
 - [ ] **B) Moyenne** — 10 000 - 100 000 utilisateurs, 1-50 Go
 - [ ] **C) Grande** — > 100 000 utilisateurs, > 50 Go
-- [ ] **D) Autre** : ******\*\*\*\*******\_******\*\*\*\*******
+- [ ] **D) Autre** : **\*\***\*\*\*\***\*\***\_**\*\***\*\*\*\***\*\***
 - [ ] **E) Laisser l'IA décider et justifier son choix**
 
 ---
@@ -508,6 +509,27 @@ une base relationnelle est plus adaptée. PostgreSQL offre :
    - lines: nombre de lignes du document
 8. AFFICHER résumé : "✅ [nom] généré (X lignes, dépendances: Y)"
 ```
+
+### Lors du mode `validate` (qualité Markdown & Mermaid)
+
+`````
+1. SCANNER tous les fichiers /docs/*.md
+2. VÉRIFIER la validité Markdown structurelle :
+  - tous les blocs de code (fences ``` ... ```) sont correctement ouverts/fermés
+  - pas de mélange incohérent de fences (ex: ``` et ````) dans un même fichier
+3. VÉRIFIER les blocs Mermaid :
+  - fence d'ouverture EXACTE : ```mermaid
+  - fence de fermeture : ```
+  - le premier token du bloc est un type Mermaid valide (ex: flowchart, graph, sequenceDiagram, journey, erDiagram, stateDiagram)
+4. SIGNALER les erreurs de rendu probables :
+  - caractères parasites autour des fences
+  - indentation invalide dans journey / erDiagram
+  - blocs Mermaid vides
+5. RAPPORTER un tableau d'erreurs (fichier, bloc #, type, correction suggérée)
+6. SI erreurs Mermaid/Markdown : marquer le(s) document(s) concerné(s) en `error` dans .doc-status.json (sans écraser le contenu)
+
+Note : si un linter Mermaid externe n'est pas disponible, effectuer au minimum les contrôles structurels ci-dessus et mentionner cette limitation dans le rapport.
+`````
 
 ### Format de sortie après chaque exécution
 
@@ -1614,6 +1636,7 @@ Avant de livrer, vérifier :
 - [ ] **Actionnabilité** : Chaque document permet de passer à l'action immédiatement
 - [ ] **Personnalisation** : Le contenu est spécifique au brief, pas générique
 - [ ] **Tracking** : Le fichier `.doc-status.json` est à jour et cohérent
+- [ ] **Validité Markdown/Mermaid** : aucun bloc de code non fermé, et les diagrammes `mermaid` sont sans erreur de syntaxe (rendus sans erreur)
 
 
 ```
