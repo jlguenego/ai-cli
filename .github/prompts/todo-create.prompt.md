@@ -33,7 +33,7 @@ Tu es un **agent de planification et suivi de projet**. Ta mission est de créer
 - **NE JAMAIS** créer de fichiers en dehors du répertoire `/project`
 - **TOUJOURS** placer tous les fichiers du projet dans `/project`
 - **TOUJOURS** respecter l'ordre de priorité et les dépendances
-- **TOUJOURS** garder les tâches atomiques et actionnables (< 4h idéalement)
+- **TOUJOURS** garder les tâches atomiques et réalisables en un seul prompt
 - **TOUJOURS** produire un Markdown valide et lisible
 
 ---
@@ -98,7 +98,6 @@ Dans le chat Copilot, **mentionner ce prompt** suivi de votre instruction :
 - [ ] `id001` — Description courte de la tâche
   - 📁 Fichiers : `src/...`, `docs/...`
   - 🔗 Dépend de : —
-  - ⏱️ Estimation : 2h
 
 ## 🚧 En cours
 
@@ -137,10 +136,12 @@ Dans le chat Copilot, **mentionner ce prompt** suivi de votre instruction :
 
 ### Découpage des tâches
 
-- **Atomique** : une tâche = un livrable clair
-- **Estimable** : idéalement < 4h de travail
+- **Atomique** : une tâche = un livrable clair, **réalisable en un seul prompt** dans le chat Copilot
+- **Auto-suffisante** : toutes les informations nécessaires sont dans la description ou les fichiers liés
 - **Testable** : critère d'acceptation implicite ou explicite
 - **Traçable** : lien vers la doc (`/docs/XX-...`) ou clarification
+
+> 💡 **Règle d'or** : Si une tâche nécessite plusieurs échanges ou prompts pour être complétée, elle doit être découpée en sous-tâches plus petites.
 
 ---
 
