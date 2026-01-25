@@ -19,7 +19,7 @@
   - 📁 Fichiers : `project/src/cli.ts`, `project/src/index.ts`
   - 🔗 Dépend de : `id001`
 
-- [ ] `id003` — Implémenter la commande `jlgcli backends` (liste statique)
+- [x] `id003` — Implémenter la commande `jlgcli backends` (liste statique)
   - 📁 Fichiers : `project/src/commands/backends.ts`
   - 🔗 Dépend de : `id002`
 

@@ -6,6 +6,7 @@
 
 import { Command } from "commander";
 import { VERSION, NAME, CLI_NAME } from "./index.js";
+import { registerBackendsCommand } from "./commands/backends.js";
 
 /**
  * Crée et configure le programme CLI principal.
@@ -18,6 +19,9 @@ function createProgram(): Command {
     .description("CLI pour orchestrer des agents IA via des backends externes")
     .version(VERSION, "-v, --version", "Affiche la version")
     .helpOption("-h, --help", "Affiche l'aide");
+
+  // Enregistrer les commandes
+  registerBackendsCommand(program);
 
   return program;
 }
