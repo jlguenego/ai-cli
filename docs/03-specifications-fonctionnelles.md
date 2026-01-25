@@ -60,11 +60,11 @@ graph TB
 
 ### F-001 : Gestion de configuration (lecture/écriture)
 
-| Attribut      | Valeur |
-| ------------- | ------ |
-| Module        | Config & State |
-| Priorité      | Must |
-| Complexité    | Moyenne |
+| Attribut      | Valeur                 |
+| ------------- | ---------------------- |
+| Module        | Config & State         |
+| Priorité      | Must                   |
+| Complexité    | Moyenne                |
 | Stories liées | US-002, US-009, US-010 |
 
 #### Description
@@ -85,30 +85,30 @@ Permettre de configurer et persister des paramètres, notamment :
 
 #### Comportement attendu
 
-| Entrée | Traitement | Sortie |
-| ------ | ---------- | ------ |
-| `config set backend copilot` | Valide `backend` ∈ backends supportés | Confirmation + code 0 |
-| `config set timeoutMs 120000` | Valide entier > 0 | Confirmation + code 0 |
-| `config get backend` | Lit config | Valeur + code 0 |
-| `config set foo bar` | Clé inconnue | Message clair + code non-zéro |
+| Entrée                        | Traitement                            | Sortie                        |
+| ----------------------------- | ------------------------------------- | ----------------------------- |
+| `config set backend copilot`  | Valide `backend` ∈ backends supportés | Confirmation + code 0         |
+| `config set timeoutMs 120000` | Valide entier > 0                     | Confirmation + code 0         |
+| `config get backend`          | Lit config                            | Valeur + code 0               |
+| `config set foo bar`          | Clé inconnue                          | Message clair + code non-zéro |
 
 #### Cas limites et erreurs
 
-| Cas | Comportement attendu |
-| --- | -------------------- |
-| Config inexistante | Utiliser defaults raisonnables, sans crash |
-| Config non parseable | Erreur claire + action (réinitialiser) |
-| Valeur hors bornes | Erreur + exemple de valeurs acceptées |
+| Cas                  | Comportement attendu                       |
+| -------------------- | ------------------------------------------ |
+| Config inexistante   | Utiliser defaults raisonnables, sans crash |
+| Config non parseable | Erreur claire + action (réinitialiser)     |
+| Valeur hors bornes   | Erreur + exemple de valeurs acceptées      |
 
 ---
 
 ### F-002 : Liste des backends et diagnostic de disponibilité
 
-| Attribut      | Valeur |
-| ------------- | ------ |
+| Attribut      | Valeur         |
+| ------------- | -------------- |
 | Module        | CLI + Backends |
-| Priorité      | Must |
-| Complexité    | Moyenne |
+| Priorité      | Must           |
+| Complexité    | Moyenne        |
 | Stories liées | US-003, US-011 |
 
 #### Description
@@ -126,27 +126,27 @@ Afficher les backends supportés et leur statut local :
 
 #### Comportement attendu
 
-| Entrée | Traitement | Sortie |
-| ------ | ---------- | ------ |
-| `backends` | Probe par adaptateur (`isAvailable`) | Liste lisible + code 0 |
-| `backends --json` | Idem + sérialisation JSON | JSON + code 0 |
+| Entrée            | Traitement                           | Sortie                 |
+| ----------------- | ------------------------------------ | ---------------------- |
+| `backends`        | Probe par adaptateur (`isAvailable`) | Liste lisible + code 0 |
+| `backends --json` | Idem + sérialisation JSON            | JSON + code 0          |
 
 #### Cas limites et erreurs
 
-| Cas | Comportement attendu |
-| --- | -------------------- |
+| Cas                      | Comportement attendu                                          |
+| ------------------------ | ------------------------------------------------------------- |
 | Aucun backend disponible | Message “aucun backend détecté” + code non-zéro dédié (ex. 2) |
-| Détection partielle | Afficher chaque backend avec statut individuel |
+| Détection partielle      | Afficher chaque backend avec statut individuel                |
 
 ---
 
 ### F-003 : Exécution one-shot (`run`)
 
-| Attribut      | Valeur |
-| ------------- | ------ |
-| Module        | Core Runner |
-| Priorité      | Must |
-| Complexité    | Moyenne |
+| Attribut      | Valeur                 |
+| ------------- | ---------------------- |
+| Module        | Core Runner            |
+| Priorité      | Must                   |
+| Complexité    | Moyenne                |
 | Stories liées | US-004, US-012, US-013 |
 
 #### Description
@@ -161,30 +161,30 @@ Exécuter un prompt sur un backend choisi (config ou `--backend`), streamer la s
 
 #### Comportement attendu
 
-| Entrée | Traitement | Sortie |
-| ------ | ---------- | ------ |
-| `run "..."` | Résout backend + exécute `runOnce` | Sortie assistant + code 0 si succès |
-| `run "..." --backend claude` | Surcharge backend | Sortie assistant |
-| `run "..." --quiet` | Réduit les logs | Sortie minimale |
+| Entrée                       | Traitement                         | Sortie                              |
+| ---------------------------- | ---------------------------------- | ----------------------------------- |
+| `run "..."`                  | Résout backend + exécute `runOnce` | Sortie assistant + code 0 si succès |
+| `run "..." --backend claude` | Surcharge backend                  | Sortie assistant                    |
+| `run "..." --quiet`          | Réduit les logs                    | Sortie minimale                     |
 
 #### Cas limites et erreurs
 
-| Cas | Comportement attendu |
-| --- | -------------------- |
-| Prompt vide | Erreur + aide d’usage |
-| Backend renvoie erreur | Message clair + code 1 |
-| Sortie énorme | Stream + tronquer uniquement les logs UI, pas le transcript artifacts |
+| Cas                    | Comportement attendu                                                  |
+| ---------------------- | --------------------------------------------------------------------- |
+| Prompt vide            | Erreur + aide d’usage                                                 |
+| Backend renvoie erreur | Message clair + code 1                                                |
+| Sortie énorme          | Stream + tronquer uniquement les logs UI, pas le transcript artifacts |
 
 ---
 
 ### F-004 : Exécution itérative (`loop`) jusqu’à complétion
 
-| Attribut      | Valeur |
-| ------------- | ------ |
+| Attribut      | Valeur                            |
+| ------------- | --------------------------------- |
 | Module        | Core Runner + Completion Protocol |
-| Priorité      | Must |
-| Complexité    | Élevée |
-| Stories liées | US-005, US-006, US-010, US-014 |
+| Priorité      | Must                              |
+| Complexité    | Élevée                            |
+| Stories liées | US-005, US-006, US-010, US-014    |
 
 #### Description
 
@@ -206,20 +206,20 @@ Boucler automatiquement :
 
 #### Comportement attendu
 
-| Entrée | Traitement | Sortie |
-| ------ | ---------- | ------ |
-| `loop "... DONE"` | Boucle jusqu’à détection `DONE` | Résumé + code 0 |
-| `loop "..." --max-iterations 3` | Limite stricte | Si non terminé → code 4 |
-| `loop "..." --timeout 2m` | Timeout global | Si dépassé → code 3 |
+| Entrée                          | Traitement                      | Sortie                  |
+| ------------------------------- | ------------------------------- | ----------------------- |
+| `loop "... DONE"`               | Boucle jusqu’à détection `DONE` | Résumé + code 0         |
+| `loop "..." --max-iterations 3` | Limite stricte                  | Si non terminé → code 4 |
+| `loop "..." --timeout 2m`       | Timeout global                  | Si dépassé → code 3     |
 
 #### Cas limites et erreurs
 
-| Cas | Comportement attendu |
-| --- | -------------------- |
+| Cas                                    | Comportement attendu                        |
+| -------------------------------------- | ------------------------------------------- |
 | Assistant ne respecte pas le protocole | Continuer jusqu’aux garde-fous + diagnostic |
-| Sortie non JSON en mode `json` | Considérer `continue` + log d’avertissement |
-| JSON invalide | Idem + diagnostic |
-| Boucle répétitive | Déclencher no-progress + résumé |
+| Sortie non JSON en mode `json`         | Considérer `continue` + log d’avertissement |
+| JSON invalide                          | Idem + diagnostic                           |
+| Boucle répétitive                      | Déclencher no-progress + résumé             |
 
 ---
 
@@ -227,8 +227,8 @@ Boucler automatiquement :
 
 | Attribut      | Valeur |
 | ------------- | ------ |
-| Module        | CLI |
-| Priorité      | Must |
+| Module        | CLI    |
+| Priorité      | Must   |
 | Complexité    | Faible |
 | Stories liées | US-007 |
 
@@ -245,22 +245,22 @@ Boucler automatiquement :
 
 #### Comportement attendu
 
-| Entrée | Traitement | Sortie |
-| ------ | ---------- | ------ |
-| `run ...` | Résumé + texte | Humain |
-| `run ... --json` | Résumé structuré | JSON |
-| `loop ... --json` | Résumé + metrics d’itérations | JSON |
+| Entrée            | Traitement                    | Sortie |
+| ----------------- | ----------------------------- | ------ |
+| `run ...`         | Résumé + texte                | Humain |
+| `run ... --json`  | Résumé structuré              | JSON   |
+| `loop ... --json` | Résumé + metrics d’itérations | JSON   |
 
 ---
 
 ### F-006 : Artifacts de run (transcript, résumé, logs)
 
-| Attribut      | Valeur |
-| ------------- | ------ |
+| Attribut      | Valeur         |
+| ------------- | -------------- |
 | Module        | Config & State |
-| Priorité      | Should |
-| Complexité    | Moyenne |
-| Stories liées | US-008 |
+| Priorité      | Should         |
+| Complexité    | Moyenne        |
+| Stories liées | US-008         |
 
 #### Description
 
@@ -276,35 +276,35 @@ Quand `--artifacts` est activé, écrire un dossier : `.jlgcli/runs/<id>/` conte
 
 #### Comportement attendu
 
-| Entrée | Traitement | Sortie |
-| ------ | ---------- | ------ |
-| `run ... --artifacts` | Crée dossier + écrit fichiers | Chemin affiché |
+| Entrée                 | Traitement                      | Sortie             |
+| ---------------------- | ------------------------------- | ------------------ |
+| `run ... --artifacts`  | Crée dossier + écrit fichiers   | Chemin affiché     |
 | `loop ... --artifacts` | Écrit par itération (optionnel) | Transcript complet |
 
 #### Cas limites et erreurs
 
-| Cas | Comportement attendu |
-| --- | -------------------- |
+| Cas                 | Comportement attendu                                        |
+| ------------------- | ----------------------------------------------------------- |
 | Droits insuffisants | Erreur explicite + proposition (changer `--cwd` ou dossier) |
-| Nom de run invalide | Générer un id safe (timestamp/uuid) |
+| Nom de run invalide | Générer un id safe (timestamp/uuid)                         |
 
 ---
 
 ## Matrice des règles métier
 
-| ID | Règle | Fonctionnalités | Validation |
-| --- | ----- | --------------- | ---------- |
-| RG-001 | Config persistée localement | F-001 | Tests unitaires + e2e config |
-| RG-002 | Options CLI surchargent config | F-001, F-003, F-004 | Tests d’intégration |
-| RG-004 | Diagnostic backends rapide | F-002 | Tests unitaires adaptateurs |
-| RG-006 | Backend indispo → code dédié | F-003, F-004 | Tests e2e |
-| RG-009 | Marker `DONE` strict | F-004 | Tests unitaires parser |
-| RG-010 | JSON `status` pour complétion | F-004 | Tests unitaires parser |
-| RG-011 | `maxIterations` stop | F-004 | Tests d’intégration |
-| RG-012 | `timeoutMs` stop | F-004 | Tests d’intégration |
-| RG-013 | `noProgressLimit` stop | F-004 | Tests unitaires “similarité” |
-| RG-014 | Résumé inclut cause d’arrêt | F-005 | Tests snapshot JSON |
-| RG-016 | Artifacts: erreurs gérées | F-006 | Tests d’intégration FS |
+| ID     | Règle                          | Fonctionnalités     | Validation                   |
+| ------ | ------------------------------ | ------------------- | ---------------------------- |
+| RG-001 | Config persistée localement    | F-001               | Tests unitaires + e2e config |
+| RG-002 | Options CLI surchargent config | F-001, F-003, F-004 | Tests d’intégration          |
+| RG-004 | Diagnostic backends rapide     | F-002               | Tests unitaires adaptateurs  |
+| RG-006 | Backend indispo → code dédié   | F-003, F-004        | Tests e2e                    |
+| RG-009 | Marker `DONE` strict           | F-004               | Tests unitaires parser       |
+| RG-010 | JSON `status` pour complétion  | F-004               | Tests unitaires parser       |
+| RG-011 | `maxIterations` stop           | F-004               | Tests d’intégration          |
+| RG-012 | `timeoutMs` stop               | F-004               | Tests d’intégration          |
+| RG-013 | `noProgressLimit` stop         | F-004               | Tests unitaires “similarité” |
+| RG-014 | Résumé inclut cause d’arrêt    | F-005               | Tests snapshot JSON          |
+| RG-016 | Artifacts: erreurs gérées      | F-006               | Tests d’intégration FS       |
 
 ---
 
