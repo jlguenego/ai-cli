@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { CONFIG_KEYS } from "../../src/config/schema.js";
+import {
+  CONFIG_KEYS,
+  PROJECT_CONFIG_FILENAME,
+  USER_CONFIG_PATH,
+} from "../../src/config/schema.js";
+import { join } from "node:path";
 
 class ConfigError extends Error {
   public readonly filePath: string;
@@ -16,6 +21,8 @@ class ConfigError extends Error {
 const loaderMock = {
   ConfigError,
   getConfigValue: vi.fn(),
+  resolveConfig: vi.fn(),
+  findProjectRoot: vi.fn(),
   loadUserConfig: vi.fn(),
   saveUserConfig: vi.fn(),
 };
@@ -29,6 +36,8 @@ describe("commands/config", () => {
     loaderMock.loadUserConfig.mockReset();
     loaderMock.saveUserConfig.mockReset();
     loaderMock.getConfigValue.mockReset();
+    loaderMock.resolveConfig.mockReset();
+    loaderMock.findProjectRoot.mockReset();
   });
 
   afterEach(() => {
@@ -220,6 +229,83 @@ describe("commands/config", () => {
       );
       expect(exitSpy).toHaveBeenCalledWith(1);
       expect(consoleErrorSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe("handleConfigShow", () => {
+    it("should call resolveConfig and print pretty JSON", async () => {
+      const resolvedConfig = {
+        backend: "copilot",
+        maxIterations: 10,
+        timeoutMs: 300000,
+        completionMode: "marker",
+        noProgressLimit: 3,
+      };
+      loaderMock.resolveConfig.mockResolvedValue(resolvedConfig);
+
+      const consoleLogSpy = vi
+        .spyOn(console, "log")
+        .mockImplementation(() => undefined);
+
+      const { handleConfigShow } = await import("../../src/commands/config.js");
+
+      await handleConfigShow();
+
+      expect(loaderMock.resolveConfig).toHaveBeenCalledTimes(1);
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        JSON.stringify(resolvedConfig, null, 2),
+      );
+    });
+  });
+
+  describe("handleConfigPath", () => {
+    it("should print user and project config paths when project root is found", async () => {
+      const projectRoot = "C:/repo";
+      loaderMock.findProjectRoot.mockReturnValue(projectRoot);
+
+      const consoleLogSpy = vi
+        .spyOn(console, "log")
+        .mockImplementation(() => undefined);
+
+      const { handleConfigPath } = await import("../../src/commands/config.js");
+
+      await handleConfigPath();
+
+      expect(loaderMock.findProjectRoot).toHaveBeenCalledTimes(1);
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        JSON.stringify(
+          {
+            userConfigPath: USER_CONFIG_PATH,
+            projectConfigPath: join(projectRoot, PROJECT_CONFIG_FILENAME),
+          },
+          null,
+          2,
+        ),
+      );
+    });
+
+    it("should print projectConfigPath as null when no project root is found", async () => {
+      loaderMock.findProjectRoot.mockReturnValue(null);
+
+      const consoleLogSpy = vi
+        .spyOn(console, "log")
+        .mockImplementation(() => undefined);
+
+      const { handleConfigPath } = await import("../../src/commands/config.js");
+
+      await handleConfigPath();
+
+      expect(loaderMock.findProjectRoot).toHaveBeenCalledTimes(1);
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        JSON.stringify(
+          {
+            userConfigPath: USER_CONFIG_PATH,
+            projectConfigPath: null,
+          },
+          null,
+          2,
+        ),
+      );
     });
   });
 });

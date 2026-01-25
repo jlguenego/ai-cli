@@ -5,6 +5,8 @@
 import { Command } from "commander";
 import {
   CONFIG_KEYS,
+  PROJECT_CONFIG_FILENAME,
+  USER_CONFIG_PATH,
   VALID_BACKENDS,
   VALID_COMPLETION_MODES,
   isValidConfig,
@@ -15,10 +17,13 @@ import {
 } from "../config/schema.js";
 import {
   getConfigValue,
+  resolveConfig,
+  findProjectRoot,
   loadUserConfig,
   saveUserConfig,
   ConfigError,
 } from "../config/loader.js";
+import { join } from "node:path";
 
 /**
  * Vérifie si une chaîne est une clé de configuration valide
@@ -106,6 +111,69 @@ export function registerConfigCommand(program: Command): void {
     .action(async (key: string, value: string) => {
       await handleConfigSet(key, value);
     });
+
+  // Sous-commande: config show
+  configCmd
+    .command("show")
+    .description("Affiche la configuration résolue")
+    .action(async () => {
+      await handleConfigShow();
+    });
+
+  // Sous-commande: config path
+  configCmd
+    .command("path")
+    .description("Affiche les chemins des fichiers de configuration")
+    .action(async () => {
+      await handleConfigPath();
+    });
+}
+
+/**
+ * Handler pour `config show`
+ */
+export async function handleConfigShow(): Promise<void> {
+  try {
+    const resolved = await resolveConfig();
+    console.log(JSON.stringify(resolved, null, 2));
+  } catch (error) {
+    if (error instanceof ConfigError) {
+      console.error(`Erreur de configuration: ${error.message}`);
+      console.error(`Fichier: ${error.filePath}`);
+      process.exit(1);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Handler pour `config path`
+ */
+export async function handleConfigPath(): Promise<void> {
+  try {
+    const projectRoot = findProjectRoot();
+    const projectConfigPath = projectRoot
+      ? join(projectRoot, PROJECT_CONFIG_FILENAME)
+      : null;
+
+    console.log(
+      JSON.stringify(
+        {
+          userConfigPath: USER_CONFIG_PATH,
+          projectConfigPath,
+        },
+        null,
+        2,
+      ),
+    );
+  } catch (error) {
+    if (error instanceof ConfigError) {
+      console.error(`Erreur de configuration: ${error.message}`);
+      console.error(`Fichier: ${error.filePath}`);
+      process.exit(1);
+    }
+    throw error;
+  }
 }
 
 /**

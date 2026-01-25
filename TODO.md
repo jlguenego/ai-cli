@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
 > Dernière mise à jour : 2026-01-25
-> Progression : 5/24 tâches (21%)
+> Progression : 8/24 tâches (33%)
 
 ## 🎯 Objectif actuel
 
@@ -53,7 +53,7 @@ _(aucune tâche en cours)_
   - 📁 Fichiers : `project/src/commands/config.ts`
   - 🔗 Dépend de : `id011`
 
-- [ ] `id014` — Implémenter `jlgcli config show` et `jlgcli config path`
+- [x] `id014` — Implémenter `jlgcli config show` et `jlgcli config path`
   - 📁 Fichiers : `project/src/commands/config.ts`
   - 🔗 Dépend de : `id012`
 
