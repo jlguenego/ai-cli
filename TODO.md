@@ -49,7 +49,7 @@ _(aucune tâche en cours)_
   - 📁 Fichiers : `project/src/commands/config.ts`
   - 🔗 Dépend de : `id011`
 
-- [ ] `id013` — Implémenter `jlgcli config set <key> <value>`
+- [x] `id013` — Implémenter `jlgcli config set <key> <value>`
   - 📁 Fichiers : `project/src/commands/config.ts`
   - 🔗 Dépend de : `id011`
 

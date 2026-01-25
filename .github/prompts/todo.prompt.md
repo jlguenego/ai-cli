@@ -194,9 +194,10 @@ description: <Résumé en une ligne>
 ## Actions post-génération
 
 1. Afficher le chemin du fichier créé
-2. Proposer d'ouvrir le fichier
-3. Demander si exécution immédiate souhaitée
-4. Suggérer la prochaine tâche selon l'ordre des dépendances
+2. Proposer 3 suites possibles
+   1. d'ouvrir le fichier
+   2. Demander si exécution immédiate souhaitée
+   3. Suggérer la prochaine tâche selon l'ordre des dépendances
 
 ---
 
