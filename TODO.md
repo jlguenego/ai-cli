@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
 > Dernière mise à jour : 2026-01-25
-> Progression : 2/24 tâches (8%)
+> Progression : 4/24 tâches (17%)
 
 ## 🎯 Objectif actuel
 
@@ -37,11 +37,11 @@ _(aucune tâche en cours)_
 
 #### Configuration
 
-- [ ] `id010` — Définir le schéma de configuration (types TypeScript)
+- [x] `id010` — Définir le schéma de configuration (types TypeScript)
   - 📁 Fichiers : `project/src/config/schema.ts`
   - 🔗 Dépend de : `id001`
 
-- [ ] `id011` — Implémenter le chargement/sauvegarde de la config utilisateur
+- [x] `id011` — Implémenter le chargement/sauvegarde de la config utilisateur
   - 📁 Fichiers : `project/src/config/loader.ts`
   - 🔗 Dépend de : `id010`
 
