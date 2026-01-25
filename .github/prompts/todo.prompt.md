@@ -1,303 +1,273 @@
 ---
 agent: agent
-mode: agent
-description: Génère un prompt de spécification détaillée pour une tâche du TODO.md
+description: Transforme une tâche du TODO.md en prompt exécutable par un agent IA
 ---
 
-# 🎯 Générateur de Prompts de Tâche
+# Générateur de Prompts de Tâche
 
-> Génère un prompt actionnable pour qu'un agent IA puisse réaliser une tâche du `/TODO.md` de manière autonome et complète.
-
----
-
-## 🧠 Persona
-
-Tu es un **Tech Lead Senior** spécialisé en :
-
-- Rédaction de prompts de haute qualité pour agents IA de codage
-- Architecture logicielle et développement dans les techniques données par `/docs/05-specifications-techniques.md` et `/docs/06-codage-guidelines.md`
-- Méthodologie Agile et Definition of Done (DoD)
-- Analyse de documentation technique et décomposition de tâches
+Transforme un identifiant de tâche (`idNNN`) du fichier `/TODO.md` en un prompt complet et autonome qu'un agent IA peut exécuter sans assistance.
 
 ---
 
-## 📥 Entrée attendue
+## Rôle
 
-L'utilisateur fournit un **identifiant de tâche** (ex: `id001`, `id012`) présent dans `/TODO.md`.
+Tu agis en tant que **Tech Lead Senior** avec une expertise en :
+
+- Conception de prompts précis pour agents IA
+- Architecture logicielle (cf. `/docs/05-specifications-techniques.md`, `/docs/06-codage-guidelines.md`)
+- Méthodologie Agile et critères de validation
 
 ---
 
-## 📤 Sortie attendue
+## Entrée
 
-Génère un fichier prompt à l'emplacement :
+Un identifiant de tâche au format `idNNN` (ex : `id001`, `id012`).
+
+---
+
+## Sortie
+
+Un fichier prompt créé à l'emplacement :
 
 ```
 /.github/prompts/<idNNN>-<slug>.prompt.md
 ```
 
-Où `<idNNN>` correspond à l'identifiant et `<slug>` est généré ainsi :
+**Règles pour le slug :**
 
-- Prendre le titre de la tâche
-- Convertir en kebab-case (minuscules, tirets, sans accents)
-- Supprimer les caractères spéciaux (+, /, etc.)
-- Limiter à 40 caractères maximum
-- **Exemple** : "Initialiser le projet Node.js + TypeScript" → `init-projet-nodejs-typescript`
+1. Extraire le titre de la tâche
+2. Convertir en kebab-case (minuscules, tirets)
+3. Supprimer accents et caractères spéciaux
+4. Limiter à 40 caractères
 
----
-
-## 🚨 Gestion des erreurs d'entrée
-
-| Situation                      | Action                                                                    |
-| ------------------------------ | ------------------------------------------------------------------------- |
-| ID n'existe pas dans `TODO.md` | Lister les IDs disponibles et demander confirmation                       |
-| Tâche déjà cochée (complétée)  | Informer l'utilisateur et proposer une autre tâche                        |
-| ID mal formaté                 | Afficher le format attendu : `idNNN` (ex: `id001`, `id012`)               |
-| Dépendances non complétées     | Avertir et proposer de générer d'abord les prompts des tâches dépendantes |
+> Exemple : `Initialiser le projet Node.js + TypeScript` → `init-projet-nodejs-typescript`
 
 ---
 
-## 📊 Vérification préalable
+## Validation de l'entrée
 
-Avant de générer le prompt, vérifier :
-
-| Critère         | Valeurs                                    | Action                               |
-| --------------- | ------------------------------------------ | ------------------------------------ |
-| **Dépendances** | Liste des `🔗 Dépend de`                   | Vérifier qu'elles sont cochées       |
-| **Clarté**      | La tâche est-elle suffisamment spécifiée ? | Si non, consulter les clarifications |
+| Problème                    | Réponse                                           |
+| --------------------------- | ------------------------------------------------- |
+| ID inexistant               | Lister les IDs disponibles, demander confirmation |
+| Tâche déjà complétée        | Informer et proposer une autre tâche              |
+| Format ID invalide          | Rappeler le format `idNNN`                        |
+| Dépendances non satisfaites | Proposer de traiter d'abord les tâches bloquantes |
 
 ---
 
-## 📋 Structure du prompt généré
+## Contrôles préalables
 
-Le prompt doit suivre cette structure :
+Avant génération, vérifier :
+
+- **Dépendances** (`🔗 Dépend de`) : toutes cochées ?
+- **Clarté** : consulter `/clarifications/*.md` si ambiguïté
+
+---
+
+## Template du prompt généré
 
 ````markdown
 ---
 agent: agent
-mode: agent
-description: <Description courte de la tâche>
-applyTo: <glob des fichiers concernés, ex: "project/src/cli/**/*.ts">
+description: <Résumé en une ligne>
 ---
 
-# <Titre de la tâche>
+# <idNNN> — <Titre de la tâche>
 
-## 🎯 Objectif
+## Objectif
 
-<Description claire et concise de ce qui doit être accompli>
+<Ce qui doit être accompli, en termes clairs et mesurables>
 
-## 📚 Contexte
+## Contexte
 
-<Résumé du contexte projet pertinent extrait de la documentation>
+<Informations essentielles extraites de la documentation>
 
-- Références aux docs : [fichier](chemin) - section pertinente
-- Dépendances avec autres tâches si applicable
+- Réf : [fichier](chemin) — section concernée
+- Dépendances : `<idXXX>`, `<idYYY>` (si applicable)
 
-## ⚠️ Pré-requis
+## Pré-requis
 
-Avant d'exécuter ce prompt, vérifier que :
+- [ ] Tâches dépendantes complétées : `<liste>`
+- [ ] Environnement configuré : <détails>
 
-- [ ] Tâches dépendantes complétées : `<liste des idXXX>`
-- [ ] Environnement prêt : <Node.js installé, dépendances, etc.>
+## Fichiers impactés
 
-> Si les pré-requis ne sont pas remplis, compléter d'abord les tâches dépendantes.
+| Fichier             | Action           | Description     |
+| ------------------- | ---------------- | --------------- |
+| `chemin/fichier.ts` | Créer / Modifier | Rôle du fichier |
 
-## 📁 Fichiers concernés
+## Critères d'acceptation
 
-| Fichier           | Action         | Description                          |
-| ----------------- | -------------- | ------------------------------------ |
-| `path/to/file.ts` | Créer/Modifier | Description de ce qui doit être fait |
+- [ ] Critère fonctionnel
+- [ ] Critère technique
+- [ ] Critère de test
 
-## ✅ Critères d'acceptation
+## Tests requis
 
-- [ ] Critère 1 (fonctionnel)
-- [ ] Critère 2 (technique)
-- [ ] Critère 3 (tests)
-- [ ] Critère N...
+**Unitaires** : `tests/unit/<module>.test.ts` — cas à couvrir
 
-## 🧪 Tests requis
+**Intégration** (si applicable) : scénarios à valider
 
-### Tests unitaires
+## Instructions
 
-- `tests/unit/<module>.test.ts` : Description des cas à couvrir
+### Étape 1 : <Action>
 
-### Tests d'intégration (si applicable)
-
-- Scénarios à valider
-
-## 🔧 Instructions d'implémentation
-
-> Pour chaque étape : (1) nommer l'action précise, (2) fournir le code/structure attendue, (3) indiquer la commande de validation.
-
-### Étape 1 : <Titre de l'action>
-
-**Action** : <Créer/Modifier/Configurer> `<chemin/fichier>`
-
-**Code/Contenu attendu** :
+**Fichier** : `chemin/fichier.ts`
 
 ```typescript
-// Code ou structure à implémenter
+// Code attendu
 ```
-````
 
-**Validation** : `<commande pour vérifier, ex: npm run build>`
+**Validation** : `<commande>`
 
-### Étape 2 : <Titre de l'action>
+### Étape 2 : <Action>
 
-<Même structure...>
+<Même structure>
 
-## ⚠️ Contraintes techniques
+## Contraintes
 
-- Contraintes issues de `/docs/06-codage-guidelines.md`
-- Patterns à respecter
+- Règles issues de `/docs/06-codage-guidelines.md`
+- Patterns obligatoires
 - Erreurs à éviter
 
-## 🏁 Definition of Done (DoD)
+## Definition of Done
 
-- [ ] Code implémenté selon les guidelines
-- [ ] Tests unitaires passent (`npm test`)
-- [ ] Pas d'erreurs ESLint/TypeScript (`npm run lint`)
-- [ ] Documentation inline si nécessaire
+- [ ] Code conforme aux guidelines
+- [ ] Tests passent (`npm test`)
+- [ ] Aucune erreur lint/TS (`npm run lint`)
 - [ ] Tâche cochée dans `/TODO.md`
 
-## 📎 Références
+## Références
 
-- [doc1](path/to/doc1.md) - Description
-- [doc2](path/to/doc2.md) - Description
-
+- [doc](chemin) — description
 ````
 
 ---
 
-## 🔄 Workflow d'exécution
+## Processus de génération
 
-1. **Analyse** : Lire `/TODO.md` et extraire les informations de la tâche demandée
-2. **Contexte** : Consulter les fichiers référencés (`📖 Réf`) et les docs pertinentes
-3. **Dépendances** : Identifier les pré-requis (`🔗 Dépend de`)
-4. **Rédaction** : Générer le prompt avec toutes les sections
-5. **Validation** : Vérifier que le prompt est auto-suffisant
-6. **Sauvegarde** : Créer le fichier `/.github/prompts/<idNNN>-<slug>.prompt.md`
-
----
-
-## ✅ Critères de qualité du prompt généré
-
-| Critère         | Description                                              |
-| --------------- | -------------------------------------------------------- |
-| **Autonomie**   | Un agent peut exécuter la tâche sans poser de questions  |
-| **Précision**   | Chemins de fichiers exacts, noms de fonctions explicites |
-| **Testabilité** | Les critères d'acceptation sont vérifiables              |
-| **Complétude**  | Toutes les informations nécessaires sont présentes       |
-| **Cohérence**   | Aligné avec les guidelines et l'architecture du projet   |
+1. **Extraire** les données de la tâche depuis `/TODO.md`
+2. **Collecter** le contexte dans les docs référencées (`📖 Réf`)
+3. **Vérifier** les dépendances (`🔗 Dépend de`)
+4. **Rédiger** le prompt selon le template
+5. **Valider** l'autonomie du prompt
+6. **Sauvegarder** dans `/.github/prompts/<idNNN>-<slug>.prompt.md`
 
 ---
 
-## 📚 Documentation de référence
+## Critères de qualité
 
-Consulter systématiquement ces fichiers pour le contexte :
-
-| Fichier                                 | Usage                            |
-| --------------------------------------- | -------------------------------- |
-| `/TODO.md`                              | Source des tâches et dépendances |
-| `/docs/00-vision.md`                    | Vision produit et périmètre      |
-| `/docs/05-specifications-techniques.md` | Architecture et composants       |
-| `/docs/06-codage-guidelines.md`         | Conventions de code et structure |
-| `/docs/08-tests-verification.md`        | Stratégie de tests               |
-| `/clarifications/*.md`                  | Décisions de clarification       |
+| Critère     | Exigence                                                |
+| ----------- | ------------------------------------------------------- |
+| Autonomie   | Exécutable sans question supplémentaire                 |
+| Précision   | Chemins exacts, noms de fonctions explicites            |
+| Testabilité | Critères d'acceptation vérifiables automatiquement      |
+| Complétude  | Toutes les informations nécessaires incluses            |
+| Cohérence   | Aligné avec l'architecture et les conventions du projet |
 
 ---
 
-## 🚫 Anti-patterns à éviter
+## Documentation de référence
 
-- ❌ Prompts vagues sans chemins de fichiers précis
-- ❌ Critères d'acceptation non testables
-- ❌ Oublier de mentionner les dépendances
-- ❌ Ne pas référencer la documentation existante
-- ❌ Instructions trop génériques ("implémenter la fonctionnalité")
-- ❌ Manquer la section tests
-
----
-
-## ✅ Actions post-génération
-
-1. **Afficher** le chemin du fichier créé
-2. **Proposer** d'ouvrir le fichier dans l'éditeur
-3. **Demander** si l'utilisateur veut exécuter le prompt immédiatement
-4. **Suggérer** la prochaine tâche selon les dépendances
+| Fichier                                 | Contenu                         |
+| --------------------------------------- | ------------------------------- |
+| `/TODO.md`                              | Liste des tâches et dépendances |
+| `/docs/00-vision.md`                    | Vision et périmètre             |
+| `/docs/05-specifications-techniques.md` | Architecture technique          |
+| `/docs/06-codage-guidelines.md`         | Conventions de code             |
+| `/docs/08-tests-verification.md`        | Stratégie de tests              |
+| `/clarifications/*.md`                  | Décisions et clarifications     |
 
 ---
 
-## 💡 Exemple complet
+## Erreurs à éviter
 
-Pour la tâche `id001 — Initialiser le projet Node.js + TypeScript`, voici un exemple de prompt généré :
+- Prompts vagues sans chemins de fichiers précis
+- Critères d'acceptation non vérifiables
+- Oubli des dépendances entre tâches
+- Absence de références à la documentation
+- Instructions génériques ("implémenter la feature")
+- Section tests manquante
 
-```markdown
+---
+
+## Actions post-génération
+
+1. Afficher le chemin du fichier créé
+2. Proposer d'ouvrir le fichier
+3. Demander si exécution immédiate souhaitée
+4. Suggérer la prochaine tâche selon l'ordre des dépendances
+
+---
+
+## Exemple
+
+**Entrée** : `id001`
+
+**Tâche** : Initialiser le projet Node.js + TypeScript
+
+**Prompt généré** :
+
+````markdown
 ---
 agent: agent
-mode: agent
 description: Initialiser le projet Node.js 22 LTS avec TypeScript 5.x
-applyTo: "project/{package.json,tsconfig.json}"
 ---
 
 # id001 — Initialiser le projet Node.js + TypeScript
 
-## 🎯 Objectif
+## Objectif
 
-Créer la structure de base du projet avec Node.js 22 LTS et TypeScript 5.x, prêt pour le développement du CLI.
+Créer la structure de base du projet avec Node.js 22 LTS et TypeScript 5.x.
 
-## 📚 Contexte
+## Contexte
 
-Ce projet est un CLI nommé `jlgcli` qui permet d'orchestrer des agents IA.
+CLI `jlgcli` pour orchestrer des agents IA.
 
-- Réf : [docs/05-specifications-techniques.md](docs/05-specifications-techniques.md) - Section "Stack technique"
-- Réf : [docs/06-codage-guidelines.md](docs/06-codage-guidelines.md) - Section "Structure projet"
+- Réf : [docs/05-specifications-techniques.md](docs/05-specifications-techniques.md) — Stack technique
+- Réf : [docs/06-codage-guidelines.md](docs/06-codage-guidelines.md) — Structure projet
 
-## ⚠️ Pré-requis
+## Pré-requis
 
-- [ ] Node.js 22 LTS installé (`node --version`)
-- [ ] npm 10+ installé (`npm --version`)
+- [ ] Node.js 22 LTS (`node --version`)
+- [ ] npm 10+ (`npm --version`)
 
-## 📁 Fichiers concernés
+## Fichiers impactés
 
-| Fichier | Action | Description |
-| ------- | ------ | ----------- |
-| `project/package.json` | Créer | Manifest npm avec scripts et métadonnées |
-| `project/tsconfig.json` | Créer | Configuration TypeScript stricte |
+| Fichier                 | Action | Description       |
+| ----------------------- | ------ | ----------------- |
+| `project/package.json`  | Créer  | Manifest npm      |
+| `project/tsconfig.json` | Créer  | Config TypeScript |
 
-## ✅ Critères d'acceptation
+## Critères d'acceptation
 
-- [ ] `npm install` s'exécute sans erreur
-- [ ] `npx tsc --noEmit` ne retourne aucune erreur
-- [ ] Le projet utilise ESM (type: "module")
-- [ ] Target ES2022 minimum
+- [ ] `npm install` réussit
+- [ ] `npx tsc --noEmit` réussit
+- [ ] ESM activé (`type: "module"`)
+- [ ] Target ES2022+
 
-## 🔧 Instructions d'implémentation
+## Instructions
 
 ### Étape 1 : Créer package.json
 
-**Action** : Créer `project/package.json`
+**Fichier** : `project/package.json`
 
-**Contenu** :
 ```json
 {
   "name": "@jlguenego/ai-cli",
   "version": "0.1.0",
   "type": "module",
   "bin": { "jlgcli": "./bin/jlgcli.js" },
-  "scripts": {
-    "build": "tsc",
-    "test": "vitest"
-  },
+  "scripts": { "build": "tsc", "test": "vitest" },
   "engines": { "node": ">=22.0.0" }
 }
-````
+```
 
 **Validation** : `npm install`
 
 ### Étape 2 : Créer tsconfig.json
 
-**Action** : Créer `project/tsconfig.json`
-
-**Contenu** :
+**Fichier** : `project/tsconfig.json`
 
 ```json
 {
@@ -315,17 +285,14 @@ Ce projet est un CLI nommé `jlgcli` qui permet d'orchestrer des agents IA.
 
 **Validation** : `npx tsc --noEmit`
 
-## 🏁 Definition of Done
+## Definition of Done
 
 - [ ] `npm install` réussit
 - [ ] `npx tsc --noEmit` réussit
 - [ ] Tâche cochée dans `/TODO.md`
 
-## 📎 Références
+## Références
 
 - [docs/05-specifications-techniques.md](docs/05-specifications-techniques.md)
 - [docs/06-codage-guidelines.md](docs/06-codage-guidelines.md)
-
-```
-
-```
+````
