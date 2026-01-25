@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
-> Dernière mise à jour : 2026-01-25 10:00
-> Progression : 0/24 tâches (0%)
+> Dernière mise à jour : 2026-01-25
+> Progression : 1/24 tâches (4%)
 
 ## 🎯 Objectif actuel
 
@@ -11,7 +11,7 @@
 
 ## 🔥 Priorité haute (Quick Wins / Démontrable)
 
-- [ ] `id001` — Initialiser le projet Node.js/TypeScript avec package.json
+- [x] `id001` — Initialiser le projet Node.js/TypeScript avec package.json
   - 📁 Fichiers : `project/package.json`, `project/tsconfig.json`
   - 🔗 Dépend de : —
 
