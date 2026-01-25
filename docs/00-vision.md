@@ -2,7 +2,7 @@
 
 ## Résumé exécutif
 
-`@jlguenego/ai-cli` est une librairie NPM fournissant un exécutable `jlgcli` qui orchestre des assistants IA en ligne de commande (ex. Copilot CLI, Claude Code CLI, Codex CLI) afin d’exécuter des tâches longues de manière autonome.
+`@jlguenego/ai-cli` est une librairie NPM fournissant un exécutable `jlgcli` qui orchestre des assistants IA en ligne de commande (ex. Copilot CLI, Codex CLI ; Claude Code hors MVP) afin d’exécuter des tâches longues de manière autonome.
 
 Le produit vise à réduire la supervision manuelle (relances, découpages, micro-prompts) et à standardiser l’orchestration multi-backends via une abstraction unique, avec une exécution itérative _idempotente_ jusqu’à un signal de fin explicite.
 
@@ -61,7 +61,7 @@ Un orchestrateur CLI unique (`jlgcli`) capable de piloter différents backends I
 
 - **Adaptateurs backend**
   - Interface commune : disponibilité, exécution, streaming, résultat normalisé.
-  - Backends initiaux : au moins 1 backend fonctionnel, structure extensible.
+  - Backends initiaux (MVP) : **Copilot + Codex** (structure extensible).
 
 - **Exécution one-shot**
   - Exécuter un prompt sur le backend sélectionné et afficher le résultat.
@@ -70,7 +70,7 @@ Un orchestrateur CLI unique (`jlgcli`) capable de piloter différents backends I
   - Boucler : prompt → sortie → décision `continue|done|error`.
   - Détection de fin :
     - Mode marqueur : ligne finale exactement `DONE`.
-    - Mode JSON : objet final avec `status` (`continue|done|error`).
+    - Mode JSON : extraction du **dernier objet JSON valide** `{status, summary?, next?}`.
   - Garde-fous : maximum d’itérations, timeout global, non-progrès.
 
 - **Observabilité CLI**
@@ -78,7 +78,8 @@ Un orchestrateur CLI unique (`jlgcli`) capable de piloter différents backends I
   - Sortie JSON optionnelle (`--json`) pour CI.
 
 - **Artifacts (optionnel MVP)**
-  - Avec `--artifacts`, écrire un dossier `.jlgcli/runs/<id>/` contenant transcript + résumé.
+  - Avec `--artifacts`, écrire un dossier `.jlgcli/runs/<id>/` contenant au minimum `meta.json`, `transcript.ndjson`, `result.json`.
+  - Si l’écriture échoue, le run échoue avec un code de création (recommandation : `EX_CANTCREAT=73`).
 
 ### Out of scope
 
@@ -98,11 +99,12 @@ Un orchestrateur CLI unique (`jlgcli`) capable de piloter différents backends I
 ## Critères de succès
 
 - `jlgcli --version` fonctionne (installation validée, code retour 0).
-- `jlgcli backends` affiche la liste des backends supportés + statut `available|missing|unauthenticated`.
+- `jlgcli backends` affiche la liste des backends supportés + statut `available|missing|unauthenticated|unsupported`.
 - `jlgcli run <prompt>` retourne une sortie et un code retour cohérent.
 - `jlgcli loop <prompt>` s’arrête :
   - dès qu’un `DONE` (mode marker) ou `{"status":"done"}` (mode JSON) est détecté ;
   - sinon à `maxIterations` / `timeoutMs` avec un échec contrôlé et un résumé.
+  - en mode JSON, si aucun JSON valide n’est extractible : échec contrôlé (recommandation : `EX_DATAERR=65`).
 - Le run produit un résumé final humain-lisible, et optionnellement JSON.
 
 ## Principes de conception (MVP)
@@ -111,7 +113,7 @@ Un orchestrateur CLI unique (`jlgcli`) capable de piloter différents backends I
 - **Contrat explicite de complétion** : la fin doit être détectable sans ambiguïté (marqueur `DONE` ou JSON structuré), sinon le runner applique des garde-fous.
 - **Multi-backends sans surprise** : l’utilisateur change de backend sans devoir réapprendre l’outil ; les différences de streaming, erreurs et codes retour sont normalisées.
 - **Sécurité par défaut** : logs utiles mais sobres ; ne pas exposer de secrets ; privilégier des variables d’environnement et une documentation claire.
-- **Windows-first** : chemins, quoting, encodage et comportements shell doivent être robustes sur Windows (puis macOS/Linux).
+- **Windows-first, multi-OS MVP** : chemins, quoting, encodage et comportements shell doivent être robustes sur Windows, et vérifiés aussi sur macOS/Linux.
 
 ## Contraintes & exigences clés
 
@@ -121,7 +123,7 @@ Un orchestrateur CLI unique (`jlgcli`) capable de piloter différents backends I
 | Distribution  | Package NPM publiable                                |
 | Nom / scope   | `@jlguenego/ai-cli`                                  |
 | Binaire       | `jlgcli`                                             |
-| Compatibilité | Windows prioritaire (idéalement macOS/Linux)         |
+| Compatibilité | Windows + macOS + Linux (Windows-first)              |
 | Ergonomie     | Logs lisibles, statut de progression, résumé final   |
 | Fiabilité     | Timeouts, limites, et mécanismes de reprise à cadrer |
 

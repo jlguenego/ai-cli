@@ -1,9 +1,9 @@
 ---
 id: "002"
 slug: "contrat-completion-json"
-status: "ouvert" # ouvert | cloture
+status: "cloture" # ouvert | cloture
 created_at: "2026-01-25T13:36:24.9556869Z"
-updated_at: "2026-01-25T13:36:24.9556869Z"
+updated_at: "2026-01-25T14:01:05Z"
 related_docs:
   - "02-user-stories-flows"
   - "03-specifications-fonctionnelles"
@@ -25,7 +25,7 @@ Le mode de complétion `json` est recommandé comme plus robuste que le marker `
 ## Question 1 : Où doit se trouver l’objet JSON de décision (`status`) ?
 
 - [ ] **A) Dernière ligne uniquement** (ex: `{"status":"done"}` comme dernière ligne stdout)
-- [ ] **B) Dernier bloc JSON** (chercher le dernier objet JSON valide dans la sortie)
+- [x] **B) Dernier bloc JSON** (chercher le dernier objet JSON valide dans la sortie)
 - [ ] **C) Bloc délimité** (ex: lignes `BEGIN_JSON` / `END_JSON` autour de l’objet)
 - [ ] **D) Dans un code fence** (ex: `json ... ` )
 - [ ] **E) Laisser l’IA décider et justifier son choix**
@@ -33,17 +33,17 @@ Le mode de complétion `json` est recommandé comme plus robuste que le marker `
 ## Question 2 : Schéma minimal de l’objet final
 
 - [ ] **A) Minimal strict : `{ "status": "continue"|"done"|"error" }`**
-- [ ] **B) Étendu : `{ status, summary?, next? }`** (où `summary` est texte, `next` est consigne)
+- [x] **B) Étendu : `{ status, summary?, next? }`** (où `summary` est texte, `next` est consigne)
 - [ ] **C) Étendu : `{ status, reasonCode?, metrics? }`** (mieux pour CI)
-- [ ] **D) Autre** : **************\_\_**************
+- [ ] **D) Autre** : **\*\***\*\***\*\***\_\_**\*\***\*\***\*\***
 - [ ] **E) Laisser l’IA décider et justifier son choix**
 
 ## Question 3 : Que faire si le parsing JSON échoue en mode `json` ?
 
 - [ ] **A) Fallback `continue` + warning** (jusqu’aux garde-fous)
-- [ ] **B) Stop immédiat en erreur** (exit code “invalid-json” dédié)
+- [x] **B) Stop immédiat en erreur** (exit code “invalid-json” dédié)
 - [ ] **C) Réessayer 1 fois** (ex: demander au backend de renvoyer uniquement le JSON)
-- [ ] **D) Autre** : **************\_\_**************
+- [ ] **D) Autre** : **\*\***\*\***\*\***\_\_**\*\***\*\***\*\***
 - [ ] **E) Laisser l’IA décider et justifier son choix**
 
 ---
@@ -57,5 +57,20 @@ Le mode de complétion `json` est recommandé comme plus robuste que le marker `
 
 ## Décision finale
 
-<!-- Section remplie automatiquement par l'IA après clôture -->
-<!-- Ne pas modifier manuellement -->
+**Contrat retenu (mode `json`)**
+
+- **Emplacement** : le runner extrait le **dernier objet JSON valide** présent dans la sortie (stdout). Le reste de la sortie peut contenir du texte, des logs, ou des explications.
+- **Schéma minimal** :
+  - `status` (obligatoire) ∈ `continue | done | error`
+  - `summary` (optionnel) : texte court
+  - `next` (optionnel) : consigne/action suivante (texte)
+
+**Parsing et erreurs**
+
+- Si **aucun JSON valide** n’est trouvé, ou si le JSON ne respecte pas le schéma minimal : **arrêt immédiat en erreur**.
+- Recommandation de code de sortie (cohérent avec la stratégie “POSIX-like”) : **`EX_DATAERR (65)`** pour “invalid-json”.
+
+**Rationale**
+
+- “Dernier objet JSON valide” réduit les ambiguïtés sans imposer de marqueurs supplémentaires.
+- Le schéma `{ status, summary?, next? }` garde une UX humaine (summary/next) tout en restant facile à parser en CI.

@@ -2,7 +2,7 @@
 
 ## Contexte architectural
 
-`jlgcli` est un orchestrateur **local** (Windows-first) qui pilote des **CLIs IA externes** (Copilot CLI, Claude Code CLI, Codex CLI, …) via des adaptateurs.
+`jlgcli` est un orchestrateur **local** (Windows-first) qui pilote des **CLIs IA externes** via des adaptateurs. **MVP : Copilot + Codex** (Claude est hors périmètre MVP mais gardé comme extension future).
 
 ### Vue d'ensemble (OBLIGATOIRE)
 
@@ -27,19 +27,19 @@ graph TB
 
   subgraph adapters["Backends (adaptateurs)"]
     A1["Adapter: copilot"]
-    A2["Adapter: claude"]
-    A3["Adapter: codex"]
+    A2["Adapter: codex"]
+    A3["Adapter: claude (hors MVP)"]
   end
 
   subgraph externals["CLIs externes"]
     E1["Copilot CLI"]
-    E2["Claude Code CLI"]
-    E3["Codex CLI"]
+    E2["Codex CLI"]
+    E3["Claude Code CLI (hors MVP)"]
   end
 
   U --> CLI
   RUN --> A1
-  RUN -. "extensible" .-> A2
+  RUN --> A2
   RUN -. "extensible" .-> A3
   A1 --> E1
   A2 --> E2
@@ -147,7 +147,7 @@ Les backends sont des binaires externes, dont la sortie doit être streamée pro
 | Attribut  | Valeur     |
 | --------- | ---------- |
 | Date      | 2026-01-25 |
-| Statut    | Proposé    |
+| Statut    | Accepté    |
 | Décideurs | Mainteneur |
 
 #### Contexte
@@ -164,7 +164,14 @@ Le brief demande une **config locale persistée** et une compatibilité Windows.
 
 #### Décision
 
-**Option retenue (proposée)** : **C) Les deux**.
+**Option retenue** : **C) Les deux**.
+
+Chemins retenus (MVP) :
+
+- **Config projet** : `.jlgcli.json` (à la racine du projet)
+- **Config utilisateur (Windows)** : `%USERPROFILE%\\.jlgcli.json`
+
+Détection de la racine projet : remonter depuis le CWD jusqu’à trouver `.jlgcli.json`.
 
 Ordre de priorité recommandé :
 
@@ -185,7 +192,7 @@ Ordre de priorité recommandé :
 | Attribut  | Valeur     |
 | --------- | ---------- |
 | Date      | 2026-01-25 |
-| Statut    | Proposé    |
+| Statut    | Accepté    |
 | Décideurs | Mainteneur |
 
 #### Contexte
@@ -201,7 +208,13 @@ Le runner `loop` a besoin d’un signal robuste et parseable pour décider `cont
 
 #### Décision
 
-**Option retenue (proposée)** : **supporter A + B**, avec **B par défaut** (recommandé) et fallback `continue` si parsing JSON échoue.
+**Option retenue** : **supporter A + B**, avec **B par défaut** (recommandé).
+
+Contrat `json` retenu :
+
+- Extraire le **dernier objet JSON valide** de la sortie.
+- Schéma minimal : `{ status, summary?, next? }` avec `status ∈ continue|done|error`.
+- Si parsing/validation échoue : arrêt immédiat **invalid-json** (recommandation : `EX_DATAERR = 65`).
 
 #### Conséquences
 
@@ -215,7 +228,7 @@ Le runner `loop` a besoin d’un signal robuste et parseable pour décider `cont
 | Attribut  | Valeur     |
 | --------- | ---------- |
 | Date      | 2026-01-25 |
-| Statut    | Proposé    |
+| Statut    | Accepté    |
 | Décideurs | Mainteneur |
 
 #### Contexte
@@ -231,13 +244,15 @@ Le brief évoque la traçabilité et la reprise/restart possible.
 
 #### Décision
 
-**Option retenue (proposée)** : **B) opt-in**.
+**Option retenue** : **B) opt-in**.
 
 Format recommandé : `.jlgcli/runs/<runId>/` contenant :
 
 - `meta.json` (backend, options, timings)
 - `transcript.ndjson` (événements stdout/stderr)
 - `result.json` (résumé final, status)
+
+En cas d’erreur d’écriture (droits/disque/path) **et si `--artifacts` est activé** : arrêter le run avec un code dédié (recommandation : `EX_CANTCREAT = 73`).
 
 #### Conséquences
 
@@ -287,7 +302,7 @@ Interface minimale suggérée :
 | Attribut  | Valeur     |
 | --------- | ---------- |
 | Date      | 2026-01-25 |
-| Statut    | Proposé    |
+| Statut    | Accepté    |
 | Décideurs | Mainteneur |
 
 #### Contexte
@@ -310,6 +325,10 @@ Mesures minimales :
 - ne jamais sérialiser `process.env` dans `meta.json`
 - redaction best-effort sur sorties persistées (patterns token/secret courants)
 - documentation claire “ne collez pas de secrets dans les prompts”
+
+Note d’implémentation (MVP) :
+
+- Utiliser un logger structuré (ex: `pino`) et router les logs sur **stderr** pour préserver la parseabilité de **stdout** en mode `json`.
 
 #### Conséquences
 

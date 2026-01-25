@@ -23,6 +23,7 @@ project/
 ```
 
 Notes :
+
 - séparer clairement **CLI** (UX) et **core** (logique runner) pour testabilité.
 - éviter les imports circulaires (runner ↔ adapters).
 
@@ -30,13 +31,13 @@ Notes :
 
 ## Conventions de nommage
 
-| Élément | Convention | Exemple |
-|---------|------------|---------|
-| Fichiers | kebab-case | `completion-parser.ts` |
-| Classes | PascalCase | `CopilotAdapter` |
-| Fonctions | camelCase | `parseCompletion()` |
-| Constantes | SCREAMING_SNAKE | `DEFAULT_TIMEOUT_MS` |
-| Variables | camelCase | `currentIteration` |
+| Élément    | Convention      | Exemple                |
+| ---------- | --------------- | ---------------------- |
+| Fichiers   | kebab-case      | `completion-parser.ts` |
+| Classes    | PascalCase      | `CopilotAdapter`       |
+| Fonctions  | camelCase       | `parseCompletion()`    |
+| Constantes | SCREAMING_SNAKE | `DEFAULT_TIMEOUT_MS`   |
+| Variables  | camelCase       | `currentIteration`     |
 
 ---
 
@@ -54,9 +55,16 @@ Notes :
 - Exposer des types stables : `Adapter`, `RunResult`, `CompletionStatus`, etc.
 - Ne pas typer `any` sans justification ; isoler les `unknown` et les parser.
 
+### Logging
+
+- Utiliser un logger structuré (recommandation : `pino`).
+- Écrire les logs sur **stderr**.
+- Réserver **stdout** à la sortie “résultat” (notamment en mode `--json`).
+
 ### Règles ESLint / Linter
 
 Configuration recommandée (indicative) :
+
 - `@typescript-eslint` + règles strictes
 - `eslint:recommended`
 - `no-floating-promises`
@@ -81,23 +89,23 @@ export function parseCompletion(/* ... */) {
 
 ## Patterns recommandés
 
-| Pattern | Cas d'usage | Exemple |
-| ------- | ----------- | ------- |
-| Ports/Adapters | Normaliser des backends hétérogènes | `Adapter` interface + impl `CopilotAdapter` |
-| Pure functions | Parsers & logique de décision | `parseCompletion(output)` |
-| “Result object” | Éviter exceptions incontrôlées | `{ ok: boolean, errorCode?: ... }` |
-| NDJSON events | Streaming + persistance | `transcript.ndjson` (stdout/stderr/ts) |
+| Pattern         | Cas d'usage                         | Exemple                                     |
+| --------------- | ----------------------------------- | ------------------------------------------- |
+| Ports/Adapters  | Normaliser des backends hétérogènes | `Adapter` interface + impl `CopilotAdapter` |
+| Pure functions  | Parsers & logique de décision       | `parseCompletion(output)`                   |
+| “Result object” | Éviter exceptions incontrôlées      | `{ ok: boolean, errorCode?: ... }`          |
+| NDJSON events   | Streaming + persistance             | `transcript.ndjson` (stdout/stderr/ts)      |
 
 ---
 
 ## Anti-patterns à éviter
 
-| Anti-pattern | Problème | Alternative |
-| ------------ | -------- | ----------- |
-| `shell: true` / exécution via shell | quoting Windows fragile + surface d’attaque | passer argv à `execa/spawn` |
-| Sérialiser `process.env` | fuite de secrets | whitelister uniquement des clés nécessaires |
-| Parser JSON “optimiste” | casse si backend écrit du texte autour | chercher un JSON final, sinon fallback |
-| Logguer des prompts/sorties sans redaction | risque PII/secrets | redaction best-effort + opt-in artifacts |
+| Anti-pattern                               | Problème                                    | Alternative                                                                                                                |
+| ------------------------------------------ | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `shell: true` / exécution via shell        | quoting Windows fragile + surface d’attaque | passer argv à `execa/spawn`                                                                                                |
+| Sérialiser `process.env`                   | fuite de secrets                            | whitelister uniquement des clés nécessaires                                                                                |
+| Parser JSON “optimiste”                    | casse si backend écrit du texte autour      | extraire le **dernier JSON valide** ; en mode JSON, si aucun JSON valide n’est extractible → erreur (reco `EX_DATAERR=65`) |
+| Logguer des prompts/sorties sans redaction | risque PII/secrets                          | redaction best-effort + opt-in artifacts                                                                                   |
 
 ---
 
@@ -106,10 +114,15 @@ export function parseCompletion(/* ... */) {
 ### Hiérarchie des erreurs
 
 Recommandation : erreurs “métier” avec codes stables (alignés avec les specs fonctionnelles) :
+
 - `BackendUnavailableError` → exit 2
-- `TimeoutError` → exit 3
+- `BackendUnauthenticatedError` → exit 6
+- `BackendUnsupportedError` → exit 64
+- `TimeoutError` → exit 75
 - `MaxIterationsError` → exit 4
-- `NoProgressError` → exit 1 (ou code dédié si souhaité)
+- `NoProgressError` → exit 5
+- `InvalidJsonError` → exit 65
+- `ArtifactsWriteError` → exit 73
 
 ### Format des messages
 
@@ -123,11 +136,11 @@ Recommandation : erreurs “métier” avec codes stables (alignés avec les spe
 
 ### Branches
 
-| Type | Format | Exemple |
-| ---- | ------ | ------- |
-| Feature | `feature/<ticket>-<description>` | `feature/US-005-loop-runner` |
-| Bugfix | `fix/<ticket>-<description>` | `fix/BUG-042-timeout-parsing` |
-| Chore | `chore/<description>` | `chore/ci-windows-matrix` |
+| Type    | Format                           | Exemple                       |
+| ------- | -------------------------------- | ----------------------------- |
+| Feature | `feature/<ticket>-<description>` | `feature/US-005-loop-runner`  |
+| Bugfix  | `fix/<ticket>-<description>`     | `fix/BUG-042-timeout-parsing` |
+| Chore   | `chore/<description>`            | `chore/ci-windows-matrix`     |
 
 ### Commits (Conventional Commits)
 
@@ -143,4 +156,3 @@ docs: update usage examples
 - Template recommandé (problème → solution → tests)
 - CI verte requise
 - (si équipe) 1 review minimum
-

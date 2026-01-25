@@ -27,23 +27,28 @@ flowchart LR
 
 ## Environnements
 
-| Environnement | “URL” | Déploiement | Usage |
-| ------------ | ----- | ----------- | ----- |
-| Development | local | Manuel | dev/itérations |
-| CI | GitHub Actions | Automatique | build/test/lint |
-| Release | NPM registry | Automatique (tag) ou manuel | distribution |
+| Environnement | “URL”          | Déploiement                 | Usage           |
+| ------------- | -------------- | --------------------------- | --------------- |
+| Development   | local          | Manuel                      | dev/itérations  |
+| CI            | GitHub Actions | Automatique                 | build/test/lint |
+| Release       | NPM registry   | Automatique (tag) ou manuel | distribution    |
 
 ---
 
 ## Configuration par environnement
 
-| Variable | Dev | CI | Release |
-| -------- | --- | -- | ------- |
-| `NODE_VERSION` | 20+ | matrix (20/22) | 20+ |
-| `NPM_TOKEN` | absent | secret (si publish) | secret |
-| `LOG_LEVEL` | debug | info | info |
+| Variable       | Dev    | CI                  | Release |
+| -------------- | ------ | ------------------- | ------- |
+| `NODE_VERSION` | 20+    | 20+                 | 20+     |
+| `NPM_TOKEN`    | absent | secret (si publish) | secret  |
+| `LOG_LEVEL`    | debug  | info                | info    |
+
+Notes CI :
+
+- exécuter la CI sur une matrice OS **Windows + macOS + Linux** (ex: `windows-latest`, `macos-latest`, `ubuntu-latest`).
 
 Notes sécurité :
+
 - ne jamais écrire les tokens dans les logs
 - privilégier `NPM_TOKEN` (secret GitHub Actions) + permissions minimales
 
@@ -70,6 +75,7 @@ Notes sécurité :
 ## Infrastructure as Code
 
 Non applicable au MVP : pas de service déployé. Si une infra apparaît plus tard (ex: serveur d’orchestration), alors :
+
 - définir `infrastructure/` (terraform)
 - et environnements `staging/production`
 

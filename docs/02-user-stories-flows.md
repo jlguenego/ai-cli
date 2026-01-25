@@ -14,7 +14,7 @@
 
 ### Epic 3 : Découverte & diagnostic des backends
 
-**Objectif** : Exposer les backends supportés et leur état (disponible/manquant/non-authentifié).
+**Objectif** : Exposer les backends supportés et leur état (disponible/manquant/non-authentifié/non supporté).
 **Valeur business** : Réduire les erreurs et accélérer le troubleshooting.
 
 ### Epic 4 : Exécution one-shot
@@ -85,7 +85,8 @@
 
 **Given** je souhaite une détection robuste
 **When** je lance `jlgcli config set completionMode json`
-**Then** `loop` interprète un objet final `{ "status": "done" | "continue" | "error" }`
+**Then** `loop` extrait le **dernier objet JSON valide** `{ "status": "done" | "continue" | "error", "summary"?: string, "next"?: string }`
+**And** si aucun JSON valide ne peut être extrait, le run échoue (recommandation : exit 65)
 
 ---
 
@@ -102,7 +103,7 @@
 
 **When** je lance `jlgcli backends`
 **Then** je vois la liste des backends supportés
-**And** chaque backend affiche un statut `available`/`missing`/`unauthenticated`
+**And** chaque backend affiche un statut `available`/`missing`/`unauthenticated`/`unsupported`
 
 #### US-011 : Backends en JSON
 
@@ -184,7 +185,8 @@
 #### US-008 : Artifacts
 
 **When** je lance un run avec `--artifacts`
-**Then** un dossier `.jlgcli/runs/<id>/` est créé avec transcript et résumé
+**Then** un dossier `.jlgcli/runs/<id>/` est créé avec au minimum `meta.json`, `transcript.ndjson`, `result.json`
+**And** si l’écriture échoue, le run échoue (recommandation : exit 73)
 
 ---
 
@@ -196,23 +198,28 @@
 flowchart TD
     A[Début: jlgcli loop] --> B[Charger config + args]
     B --> C{Backend disponible?}
-    C -->|Non| C1[Erreur: backend missing/unauthenticated]
-    C1 --> Z[Fin: code=2]
+    C -->|Non| C1[Erreur: backend missing/unauthenticated/unsupported]
+    C1 --> C2{Statut?}
+    C2 -->|missing| Z1[Fin: code=2]
+    C2 -->|unauthenticated| Z2[Fin: code=6]
+    C2 -->|unsupported| Z3[Fin: code=64]
     C -->|Oui| D[Initialiser run + timers]
     D --> E[Itération i: envoyer prompt]
     E --> F[Stream stdout/stderr]
     F --> G[Parser sortie: completionMode marker/json]
+    G -->|invalid-json| J2[Exit 65: invalid JSON]
     G --> H{Status?}
     H -->|done| I[Résumé final + exit 0]
     H -->|error| J[Résumé erreur + exit 1]
     H -->|continue| K{Limites dépassées?}
-    K -->|timeout| L[Exit 3: timeout]
+    K -->|timeout| L[Exit 75: timeout]
     K -->|max iterations| M[Exit 4: max itérations]
-    K -->|no progress| N[Exit 1: no progress]
+    K -->|no progress| N[Exit 5: no progress]
     K -->|Non| O[Préparer contexte itération suivante]
     O --> E
     I --> Z[Fin]
     J --> Z
+    J2 --> Z
     L --> Z
     M --> Z
     N --> Z

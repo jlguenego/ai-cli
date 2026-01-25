@@ -1,9 +1,9 @@
 ---
 id: "001"
 slug: "perimetre-backends-mvp"
-status: "ouvert" # ouvert | cloture
+status: "cloture" # ouvert | cloture
 created_at: "2026-01-25T13:36:24.9556869Z"
-updated_at: "2026-01-25T13:36:24.9556869Z"
+updated_at: "2026-01-25T14:01:05Z"
 related_docs:
   - "03-specifications-fonctionnelles"
   - "04-decisions-architectures"
@@ -25,7 +25,7 @@ Les documents mentionnent plusieurs backends (Copilot, Claude, Codex) avec une n
 
 - [ ] **A) 1 seul backend réel : Copilot uniquement** (les autres sont “non supportés” au MVP)
 - [ ] **B) 1 seul backend réel : Claude uniquement**
-- [ ] **C) 2 backends réels : Copilot + Claude**
+- [x] **C) 2 backends réels : Copilot + Codex**
 - [ ] **D) 3 backends réels : Copilot + Claude + Codex**
 - [ ] **E) Laisser l’IA décider et justifier son choix**
 
@@ -33,7 +33,7 @@ Les documents mentionnent plusieurs backends (Copilot, Claude, Codex) avec une n
 
 - [ ] **A) Ils n’apparaissent pas** (liste = uniquement ce qui est implémenté)
 - [ ] **B) Ils apparaissent avec `missing`** (car binaire absent / pas géré)
-- [ ] **C) Ils apparaissent avec `unsupported`** (nouveau statut)
+- [x] **C) Ils apparaissent avec `unsupported`** (nouveau statut)
 - [ ] **D) Ils apparaissent avec `planned`** (nouveau statut)
 - [ ] **E) Laisser l’IA décider et justifier son choix**
 
@@ -41,8 +41,8 @@ Les documents mentionnent plusieurs backends (Copilot, Claude, Codex) avec une n
 
 - [ ] **A) Windows uniquement** (support macOS/Linux “best effort” hors MVP)
 - [ ] **B) Windows + macOS** (Linux après)
-- [ ] **C) Windows + macOS + Linux** (matrice CI complète dès MVP)
-- [ ] **D) Autre** : **************\_\_**************
+- [x] **C) Windows + macOS + Linux** (matrice CI complète dès MVP)
+- [ ] **D) Autre** : **\*\***\*\***\*\***\_\_**\*\***\*\***\*\***
 - [ ] **E) Laisser l’IA décider et justifier son choix**
 
 ---
@@ -57,5 +57,14 @@ Les documents mentionnent plusieurs backends (Copilot, Claude, Codex) avec une n
 
 ## Décision finale
 
-<!-- Section remplie automatiquement par l'IA après clôture -->
-<!-- Ne pas modifier manuellement -->
+**Choix retenus (MVP)**
+
+- **Backends réellement supportés** : **Copilot + Codex**.
+- **Backends non implémentés** : visibles dans `jlgcli backends` avec le statut **`unsupported`**.
+- **Support OS (MVP)** : **Windows + macOS + Linux** avec matrice CI.
+
+**Impacts principaux sur la documentation/implémentation**
+
+- Les parcours, user stories et specs doivent refléter un MVP à 2 backends (pas 1, pas 3).
+- L’UX de `jlgcli backends` doit distinguer clairement `missing` (binaire absent pour un backend implémenté) vs `unsupported` (backend hors MVP).
+- Les décisions d’architecture et la CI doivent explicitement inclure les 3 OS.

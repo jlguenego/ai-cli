@@ -17,13 +17,13 @@ graph TB
 
   subgraph "Backends"
     B1[Adapter Copilot]
-    B2[Adapter Claude]
-    B3[Adapter Codex]
+    B2[Adapter Codex]
+    B3[Adapter Claude (hors MVP)]
   end
 
   subgraph "Completion Protocol"
     CP1[marker: DONE]
-    CP2[json: {status, summary, next}]
+    CP2[json: {status, summary?, next?}]
   end
 
   subgraph "Config & State"
@@ -40,8 +40,8 @@ graph TB
   R1 --> C1
   R2 --> C1
   R2 --> C2
-  B2 -. optionnel .-> R1
-  B3 -. optionnel .-> R1
+  B2 -. MVP .-> R1
+  B3 -. extensible .-> R1
   CP2 -. optionnel .-> R2
 ```
 
@@ -118,6 +118,7 @@ Afficher les backends supportés et leur statut local :
 - `available` : binaire détecté + auth minimale ok
 - `missing` : binaire non trouvé
 - `unauthenticated` : binaire présent mais non prêt (auth requise)
+- `unsupported` : backend connu mais **hors périmètre MVP** (non implémenté)
 
 #### Règles métier
 
@@ -161,11 +162,11 @@ Exécuter un prompt sur un backend choisi (config ou `--backend`), streamer la s
 
 #### Comportement attendu
 
-| Entrée                       | Traitement                         | Sortie                              |
-| ---------------------------- | ---------------------------------- | ----------------------------------- |
-| `run "..."`                  | Résout backend + exécute `runOnce` | Sortie assistant + code 0 si succès |
-| `run "..." --backend claude` | Surcharge backend                  | Sortie assistant                    |
-| `run "..." --quiet`          | Réduit les logs                    | Sortie minimale                     |
+| Entrée                      | Traitement                         | Sortie                              |
+| --------------------------- | ---------------------------------- | ----------------------------------- |
+| `run "..."`                 | Résout backend + exécute `runOnce` | Sortie assistant + code 0 si succès |
+| `run "..." --backend codex` | Surcharge backend                  | Sortie assistant                    |
+| `run "..." --quiet`         | Réduit les logs                    | Sortie minimale                     |
 
 #### Cas limites et erreurs
 
@@ -199,7 +200,7 @@ Boucler automatiquement :
 #### Règles métier
 
 - **RG-009** : le protocole `marker` considère `DONE` comme fin **si et seulement si** une ligne finale exactement `DONE` est présente.
-- **RG-010** : le protocole `json` considère la fin si un objet final contient `status` ∈ {`continue`,`done`,`error`}.
+- **RG-010** : le protocole `json` extrait le **dernier objet JSON valide** de la sortie, attend `{ status, summary?, next? }` et interprète `status` ∈ {`continue`,`done`,`error`}.
 - **RG-011** : la boucle s’arrête au plus tard à `maxIterations`.
 - **RG-012** : la boucle s’arrête si `timeoutMs` est dépassé.
 - **RG-013** : la boucle s’arrête si `noProgressLimit` est dépassé (sorties identiques/quasi identiques).
@@ -210,16 +211,16 @@ Boucler automatiquement :
 | ------------------------------- | ------------------------------- | ----------------------- |
 | `loop "... DONE"`               | Boucle jusqu’à détection `DONE` | Résumé + code 0         |
 | `loop "..." --max-iterations 3` | Limite stricte                  | Si non terminé → code 4 |
-| `loop "..." --timeout 2m`       | Timeout global                  | Si dépassé → code 3     |
+| `loop "..." --timeout 2m`       | Timeout global                  | Si dépassé → code 75    |
 
 #### Cas limites et erreurs
 
-| Cas                                    | Comportement attendu                        |
-| -------------------------------------- | ------------------------------------------- |
-| Assistant ne respecte pas le protocole | Continuer jusqu’aux garde-fous + diagnostic |
-| Sortie non JSON en mode `json`         | Considérer `continue` + log d’avertissement |
-| JSON invalide                          | Idem + diagnostic                           |
-| Boucle répétitive                      | Déclencher no-progress + résumé             |
+| Cas                                    | Comportement attendu                                                 |
+| -------------------------------------- | -------------------------------------------------------------------- |
+| Assistant ne respecte pas le protocole | Continuer jusqu’aux garde-fous + diagnostic                          |
+| Sortie non JSON en mode `json`         | Arrêt immédiat en erreur **invalid-json** (recommandation : exit 65) |
+| JSON invalide                          | Arrêt immédiat en erreur **invalid-json** (recommandation : exit 65) |
+| Boucle répétitive                      | Déclencher no-progress + résumé                                      |
 
 ---
 
@@ -266,13 +267,14 @@ Boucler automatiquement :
 
 Quand `--artifacts` est activé, écrire un dossier : `.jlgcli/runs/<id>/` contenant au minimum :
 
-- `transcript.txt` (ou `.md`) : sortie brute/stream
-- `summary.json` : résumé structuré
+- `meta.json` : backend, options, timings (sans `process.env`)
+- `transcript.ndjson` : événements stdout/stderr (streamables)
+- `result.json` : résumé structuré, status, exitCode
 
 #### Règles métier
 
 - **RG-015** : le chemin d’artefacts doit être compatible Windows.
-- **RG-016** : l’écriture d’artefacts ne doit pas casser le run : si erreur d’écriture, message clair et statut contrôlé.
+- **RG-016** : si `--artifacts` est activé, une erreur d’écriture **fait échouer** le run (recommandation : `EX_CANTCREAT = 73`).
 
 #### Comportement attendu
 
@@ -292,19 +294,19 @@ Quand `--artifacts` est activé, écrire un dossier : `.jlgcli/runs/<id>/` conte
 
 ## Matrice des règles métier
 
-| ID     | Règle                          | Fonctionnalités     | Validation                   |
-| ------ | ------------------------------ | ------------------- | ---------------------------- |
-| RG-001 | Config persistée localement    | F-001               | Tests unitaires + e2e config |
-| RG-002 | Options CLI surchargent config | F-001, F-003, F-004 | Tests d’intégration          |
-| RG-004 | Diagnostic backends rapide     | F-002               | Tests unitaires adaptateurs  |
-| RG-006 | Backend indispo → code dédié   | F-003, F-004        | Tests e2e                    |
-| RG-009 | Marker `DONE` strict           | F-004               | Tests unitaires parser       |
-| RG-010 | JSON `status` pour complétion  | F-004               | Tests unitaires parser       |
-| RG-011 | `maxIterations` stop           | F-004               | Tests d’intégration          |
-| RG-012 | `timeoutMs` stop               | F-004               | Tests d’intégration          |
-| RG-013 | `noProgressLimit` stop         | F-004               | Tests unitaires “similarité” |
-| RG-014 | Résumé inclut cause d’arrêt    | F-005               | Tests snapshot JSON          |
-| RG-016 | Artifacts: erreurs gérées      | F-006               | Tests d’intégration FS       |
+| ID     | Règle                           | Fonctionnalités     | Validation                   |
+| ------ | ------------------------------- | ------------------- | ---------------------------- |
+| RG-001 | Config persistée localement     | F-001               | Tests unitaires + e2e config |
+| RG-002 | Options CLI surchargent config  | F-001, F-003, F-004 | Tests d’intégration          |
+| RG-004 | Diagnostic backends rapide      | F-002               | Tests unitaires adaptateurs  |
+| RG-006 | Backend indispo → code dédié    | F-003, F-004        | Tests e2e                    |
+| RG-009 | Marker `DONE` strict            | F-004               | Tests unitaires parser       |
+| RG-010 | JSON `status` pour complétion   | F-004               | Tests unitaires parser       |
+| RG-011 | `maxIterations` stop            | F-004               | Tests d’intégration          |
+| RG-012 | `timeoutMs` stop                | F-004               | Tests d’intégration          |
+| RG-013 | `noProgressLimit` stop          | F-004               | Tests unitaires “similarité” |
+| RG-014 | Résumé inclut cause d’arrêt     | F-005               | Tests snapshot JSON          |
+| RG-016 | Artifacts: échec si écriture KO | F-006               | Tests d’intégration FS       |
 
 ---
 

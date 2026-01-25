@@ -1,9 +1,9 @@
 ---
 id: "004"
 slug: "strategie-config-paths"
-status: "ouvert" # ouvert | cloture
+status: "cloture" # ouvert | cloture
 created_at: "2026-01-25T13:36:24.9556869Z"
-updated_at: "2026-01-25T13:36:24.9556869Z"
+updated_at: "2026-01-25T14:01:05Z"
 related_docs:
   - "03-specifications-fonctionnelles"
   - "04-decisions-architectures"
@@ -24,16 +24,16 @@ L’ADR-004 propose une config “les deux” (projet + user) avec un ordre de p
 
 - [ ] **A) `%APPDATA%\\jlgcli\\config.json`**
 - [ ] **B) `%LOCALAPPDATA%\\jlgcli\\config.json`**
-- [ ] **C) Dossier home : `%USERPROFILE%\\.jlgcli\\config.json`**
-- [ ] **D) Autre** : **************\_\_**************
+- [x] **C) Dossier home : `%USERPROFILE%\\.jlgcli.json`**
+- [ ] **D) Autre** : **\*\***\*\***\*\***\_\_**\*\***\*\***\*\***
 - [ ] **E) Laisser l’IA décider et justifier son choix**
 
 ## Question 2 : Config projet — emplacement
 
 - [ ] **A) Dans le repo : `.jlgcli/config.json`** (à la racine projet)
-- [ ] **B) Dans le repo : `.jlgcli.json`** (fichier unique)
+- [x] **B) Dans le repo : `.jlgcli.json`** (fichier unique)
 - [ ] **C) Dans `package.json`** (section `jlgcli`)
-- [ ] **D) Autre** : **************\_\_**************
+- [ ] **D) Autre** : **\*\***\*\***\*\***\_\_**\*\***\*\***\*\***
 - [ ] **E) Laisser l’IA décider et justifier son choix**
 
 ## Question 3 : Comment déterminer la “racine projet” ?
@@ -41,7 +41,7 @@ L’ADR-004 propose une config “les deux” (projet + user) avec un ordre de p
 - [ ] **A) CWD uniquement** (pas de recherche)
 - [ ] **B) Remonter jusqu’à trouver `.git/`**
 - [ ] **C) Remonter jusqu’à trouver `package.json`**
-- [ ] **D) Remonter jusqu’à trouver `.jlgcli/`**
+- [x] **D) Remonter jusqu’à trouver `.jlgcli/`**
 - [ ] **E) Laisser l’IA décider et justifier son choix**
 
 ---
@@ -54,5 +54,17 @@ L’ADR-004 propose une config “les deux” (projet + user) avec un ordre de p
 
 ## Décision finale
 
-<!-- Section remplie automatiquement par l'IA après clôture -->
-<!-- Ne pas modifier manuellement -->
+**Chemins retenus (MVP)**
+
+- **Config utilisateur (Windows)** : `%USERPROFILE%\.jlgcli.json`.
+- **Config projet** : fichier unique à la racine projet : `.jlgcli.json`.
+
+**Détection de la racine projet**
+
+- À partir du CWD, **remonter l’arborescence** jusqu’à trouver `.jlgcli.json`.
+- Si non trouvé : considérer qu’on est en “mode global” (config utilisateur seule) ou produire une erreur explicite selon le besoin de la commande.
+
+**Rationale**
+
+- `.jlgcli.json` (projet) + `%USERPROFILE%\.jlgcli.json` (utilisateur) est simple à expliquer et à debugger.
+- La détection par présence de `.jlgcli.json` évite les faux positifs liés à `.git/` ou `package.json` dans des mono-repos.
