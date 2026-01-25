@@ -7,6 +7,7 @@
 import { Command } from "commander";
 import { VERSION, NAME, CLI_NAME } from "./index.js";
 import { registerBackendsCommand } from "./commands/backends.js";
+import { registerConfigCommand } from "./commands/config.js";
 
 /**
  * Crée et configure le programme CLI principal.
@@ -22,6 +23,7 @@ function createProgram(): Command {
 
   // Enregistrer les commandes
   registerBackendsCommand(program);
+  registerConfigCommand(program);
 
   return program;
 }
