@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
 > Dernière mise à jour : 2026-01-25
-> Progression : 1/24 tâches (4%)
+> Progression : 2/24 tâches (8%)
 
 ## 🎯 Objectif actuel
 
@@ -15,7 +15,7 @@
   - 📁 Fichiers : `project/package.json`, `project/tsconfig.json`
   - 🔗 Dépend de : —
 
-- [ ] `id002` — Créer le point d'entrée CLI avec commander (`jlgcli --version`)
+- [x] `id002` — Créer le point d'entrée CLI avec commander (`jlgcli --version`)
   - 📁 Fichiers : `project/src/cli.ts`, `project/src/index.ts`
   - 🔗 Dépend de : `id001`
 
