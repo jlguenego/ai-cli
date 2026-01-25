@@ -3,7 +3,7 @@
   "brief_source": "input/brief.md",
   "brief_modified_at": "2026-01-25T11:35:09.9463453Z",
   "created_at": "2026-01-25T11:38:24.4310419Z",
-  "updated_at": "2026-01-25T11:41:37.5375663Z",
+  "updated_at": "2026-01-25T12:55:33.9305374Z",
   "documents": {
     "00-vision": {
       "status": "done",
@@ -15,18 +15,22 @@
     "01-personas-parcours": {
       "status": "done",
       "version": 1,
-      "updated_at": "2026-01-25T11:41:37.5375663Z",
+      "updated_at": "2026-01-25T11:42:03.7585759Z",
       "lines": 112,
       "depends_on": []
     },
     "02-user-stories-flows": {
-      "status": "pending",
-      "version": 0,
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T12:54:06.8594063Z",
+      "lines": 167,
       "depends_on": []
     },
     "03-specifications-fonctionnelles": {
-      "status": "pending",
-      "version": 0,
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T12:55:33.9305374Z",
+      "lines": 230,
       "depends_on": [
         "00-vision",
         "01-personas-parcours",
