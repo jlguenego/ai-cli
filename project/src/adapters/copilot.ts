@@ -41,7 +41,11 @@ type ExecResult = {
 async function tryExec(
   command: string,
   args: string[],
-  opts: { cwd?: string; env?: Record<string, string | undefined>; timeoutMs?: number },
+  opts: {
+    cwd?: string;
+    env?: Record<string, string | undefined>;
+    timeoutMs?: number;
+  },
 ): Promise<ExecResult> {
   const result = await execa(command, args, {
     reject: false,
@@ -96,7 +100,9 @@ async function detectBackend(): Promise<
     const combined = `${r.stdout}\n${r.stderr}`.trim();
 
     if (r.exitCode === 0) {
-      return ghProbeDetails ? { kind: "copilot", details: ghProbeDetails } : { kind: "copilot" };
+      return ghProbeDetails
+        ? { kind: "copilot", details: ghProbeDetails }
+        : { kind: "copilot" };
     }
 
     if (looksUnauthenticated(combined)) {
@@ -163,11 +169,11 @@ export class CopilotAdapter implements Adapter {
     }
 
     if (detected.kind === "copilot") {
-      const r = await tryExec(
-        COPILOT_CMD,
-        ["suggest", args.prompt],
-        { cwd: args.cwd, env, timeoutMs: args.timeoutMs },
-      );
+      const r = await tryExec(COPILOT_CMD, ["suggest", args.prompt], {
+        cwd: args.cwd,
+        env,
+        timeoutMs: args.timeoutMs,
+      });
 
       return {
         exitCode: r.exitCode,
