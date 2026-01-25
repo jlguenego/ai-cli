@@ -3,7 +3,7 @@
   "brief_source": "input/brief.md",
   "brief_modified_at": "2026-01-25T11:35:09.9463453Z",
   "created_at": "2026-01-25T11:38:24.4310419Z",
-  "updated_at": "2026-01-25T13:18:30Z",
+  "updated_at": "2026-01-25T13:36:24.9556869Z",
   "documents": {
     "00-vision": {
       "status": "done",
@@ -92,8 +92,15 @@
     }
   },
   "clarifications": {
-    "pending": [],
+    "pending": [
+      "001-perimetre-backends-mvp",
+      "002-contrat-completion-json",
+      "003-exit-codes-et-erreurs",
+      "004-strategie-config-paths",
+      "005-artifacts-et-redaction",
+      "006-stack-outillage-node-tests-ci"
+    ],
     "resolved": []
   },
-  "blocked_by_clarifications": false
+  "blocked_by_clarifications": true
 }
