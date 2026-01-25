@@ -59,7 +59,7 @@ _(aucune tâche en cours)_
 
 #### Adaptateurs backend
 
-- [ ] `id020` — Définir l'interface commune Adapter (types + contrat)
+- [x] `id020` — Définir l'interface commune Adapter (types + contrat)
   - 📁 Fichiers : `project/src/adapters/types.ts`
   - 🔗 Dépend de : `id001`
 
