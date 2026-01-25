@@ -1,0 +1,1 @@
+﻿VALIDATE: OK (aucune erreur Markdown/Mermaid détectée).
