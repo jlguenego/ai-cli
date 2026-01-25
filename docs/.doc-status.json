@@ -3,7 +3,7 @@
   "brief_source": "input/brief.md",
   "brief_modified_at": "2026-01-25T11:35:09.9463453Z",
   "created_at": "2026-01-25T11:38:24.4310419Z",
-  "updated_at": "2026-01-25T13:02:58Z",
+  "updated_at": "2026-01-25T13:18:30Z",
   "documents": {
     "00-vision": {
       "status": "done",
@@ -45,28 +45,38 @@
       "depends_on": ["03-specifications-fonctionnelles"]
     },
     "05-specifications-techniques": {
-      "status": "pending",
-      "version": 0,
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T13:11:55Z",
+      "lines": 171,
       "depends_on": ["04-decisions-architectures"]
     },
     "06-codage-guidelines": {
-      "status": "pending",
-      "version": 0,
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T13:13:40Z",
+      "lines": 158,
       "depends_on": ["05-specifications-techniques"]
     },
     "07-refactoring-rules": {
-      "status": "pending",
-      "version": 0,
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T13:16:06Z",
+      "lines": 93,
       "depends_on": ["05-specifications-techniques"]
     },
     "08-tests-verification": {
-      "status": "pending",
-      "version": 0,
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T13:16:53Z",
+      "lines": 128,
       "depends_on": ["05-specifications-techniques"]
     },
     "09-integration-deploiement": {
-      "status": "pending",
-      "version": 0,
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T13:17:36Z",
+      "lines": 92,
       "depends_on": [
         "06-codage-guidelines",
         "07-refactoring-rules",
@@ -74,8 +84,10 @@
       ]
     },
     "10-maintenance-exploitation": {
-      "status": "pending",
-      "version": 0,
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T13:18:30Z",
+      "lines": 122,
       "depends_on": ["09-integration-deploiement"]
     }
   },
