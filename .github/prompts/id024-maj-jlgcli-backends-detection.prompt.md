@@ -190,6 +190,18 @@ Mettez ensuite à jour les assertions pour :
 - Ne pas ajouter d’abstraction prématurée : cette commande doit rester simple
 - Garder une exécution rapide (< 1s typique)
 
+### Note TypeScript (piège fréquent)
+
+Si TypeScript se plaint du typage du registre d’adaptateurs (inférence d’un `Map` trop spécifique), préférer un constructeur explicitement typé :
+
+```ts
+new Map<AdapterId, Adapter>([
+  ["copilot", new CopilotAdapter()],
+  ["codex", new CodexAdapter()],
+  ["claude", new UnsupportedClaudeAdapter()],
+]);
+```
+
 ## Definition of Done
 
 - [ ] Code conforme aux guidelines : [docs/06-codage-guidelines.md](docs/06-codage-guidelines.md)

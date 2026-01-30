@@ -112,7 +112,8 @@ class UnsupportedClaudeAdapter implements Adapter {
   }
 }
 
-const REGISTRY: ReadonlyMap<AdapterId, Adapter> = new Map([
+// Note TS: préciser les generics évite une mauvaise inférence (CopilotAdapter uniquement).
+const REGISTRY: ReadonlyMap<AdapterId, Adapter> = new Map<AdapterId, Adapter>([
   ["copilot", new CopilotAdapter()],
   ["codex", new CodexAdapter()],
   ["claude", new UnsupportedClaudeAdapter()],
