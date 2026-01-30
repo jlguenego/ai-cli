@@ -1,6 +1,6 @@
 {
   "name": "@jlguenego/ai-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI pour orchestrer des agents IA via des backends externes",
   "type": "module",
   "bin": {
