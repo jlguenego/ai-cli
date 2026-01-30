@@ -13,6 +13,7 @@ import type {
 const EXIT_SUCCESS = 0;
 const EXIT_BACKEND_MISSING = 2;
 const EXIT_MAX_ITERATIONS = 4;
+const EXIT_NO_PROGRESS = 5; // Arrêt pour non-progrès détecté
 const EXIT_BACKEND_UNAUTHENTICATED = 6;
 const EXIT_USAGE = 64; // EX_USAGE - backend inconnu ou unsupported
 const EXIT_DATAERR = 65; // EX_DATAERR - invalid-json
@@ -26,6 +27,7 @@ async function resolveLoopOptions(options: LoopOptions): Promise<{
   maxIterations: number;
   timeoutMs: number;
   completionMode: CompletionMode;
+  noProgressLimit: number;
   cwd: string;
 }> {
   const config = await resolveConfig();
@@ -35,6 +37,7 @@ async function resolveLoopOptions(options: LoopOptions): Promise<{
     maxIterations: options.maxIterations ?? config.maxIterations,
     timeoutMs: options.timeoutMs ?? config.timeoutMs,
     completionMode: options.completionMode ?? config.completionMode,
+    noProgressLimit: options.noProgressLimit ?? config.noProgressLimit,
     cwd: options.cwd ?? process.cwd(),
   };
 }
@@ -110,8 +113,14 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
   const transcript: TranscriptEntry[] = [];
 
   // Résoudre les options avec la config
-  const { backendId, maxIterations, timeoutMs, completionMode, cwd } =
-    await resolveLoopOptions(options);
+  const {
+    backendId,
+    maxIterations,
+    timeoutMs,
+    completionMode,
+    noProgressLimit,
+    cwd,
+  } = await resolveLoopOptions(options);
 
   // Vérifier si le backend existe
   const adapter = tryGetAdapterById(backendId);
@@ -145,6 +154,10 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
   let currentPrompt = options.prompt;
   let lastResponse = "";
   let summary: string | undefined;
+
+  // Variables pour la détection de non-progrès
+  let consecutiveIdenticalCount = 0;
+  let previousResponse = "";
 
   // Boucle principale
   for (let iteration = 1; iteration <= maxIterations; iteration++) {
@@ -194,6 +207,29 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
     // Callback pour affichage progressif
     if (options.onIteration) {
       options.onIteration(entry);
+    }
+
+    // Détection de non-progrès (réponses identiques consécutives)
+    if (noProgressLimit > 0) {
+      if (result.text === previousResponse) {
+        consecutiveIdenticalCount++;
+      } else {
+        consecutiveIdenticalCount = 1;
+      }
+      previousResponse = result.text;
+
+      if (consecutiveIdenticalCount >= noProgressLimit) {
+        return {
+          exitCode: EXIT_NO_PROGRESS,
+          text: result.text,
+          backend: backendId,
+          status: "no-progress",
+          iterations: transcript.length,
+          durationMs: Date.now() - startTime,
+          transcript,
+          details: `Arrêt après ${consecutiveIdenticalCount} réponses identiques consécutives`,
+        };
+      }
     }
 
     // Vérifier si le backend a échoué

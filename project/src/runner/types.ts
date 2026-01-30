@@ -96,6 +96,8 @@ export interface LoopOptions {
   timeoutMs?: number;
   /** Mode de complétion (défaut: config.completionMode) */
   completionMode?: "marker" | "json";
+  /** Nombre de répétitions sans progrès avant arrêt (défaut: config.noProgressLimit, 0 = désactivé) */
+  noProgressLimit?: number;
   /** Callback appelé à chaque itération (pour affichage progressif) */
   onIteration?: (entry: TranscriptEntry) => void;
 }

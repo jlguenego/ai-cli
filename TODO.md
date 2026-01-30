@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
-> Dernière mise à jour : 2026-01-30 15:00
-> Progression : 18/24 tâches (75%)
+> Dernière mise à jour : 2026-01-30 15:37
+> Progression : 19/24 tâches (79%)
 
 ## 🎯 Objectif actuel
 
@@ -29,12 +29,12 @@ _(aucune tâche en cours)_
 
 #### Exécution itérative (loop)
 
-- [ ] `id051` — Implémenter la détection de non-progrès (noProgressLimit)
+- [x] `id051` — Implémenter la détection de non-progrès (noProgressLimit) _(2026-01-30)_
   - 📁 Fichiers : `project/src/runner/loop.ts`
   - 🔗 Dépend de : `id050`
   - 📋 Critères : Stopper si sortie identique N fois consécutives
 
-- [ ] `id052` — Implémenter la commande `jlgcli loop <prompt>`
+- [x] `id052` — Implémenter la commande `jlgcli loop <prompt>` _(2026-01-30)_
   - 📁 Fichiers : `project/src/commands/loop.ts`, `project/src/cli.ts`
   - 🔗 Dépend de : `id050`
   - 📋 Critères : Options `--max-iterations`, `--timeout`, afficher progression

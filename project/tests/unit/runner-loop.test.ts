@@ -462,4 +462,141 @@ describe("Runner Loop", () => {
       expect(result.durationMs).toBeGreaterThanOrEqual(0);
     });
   });
+
+  describe("runLoop - no-progress detection", () => {
+    it("should stop after noProgressLimit identical responses with exit code 5", async () => {
+      const mockAdapter = createMockAdapter(
+        "copilot",
+        { status: "available" },
+        [
+          { exitCode: 0, text: "Same response" },
+          { exitCode: 0, text: "Same response" },
+          { exitCode: 0, text: "Same response" },
+        ],
+      );
+      vi.mocked(tryGetAdapterById).mockReturnValue(mockAdapter);
+
+      const result = await runLoop({
+        prompt: "Task",
+        backend: "copilot",
+        completionMode: "marker",
+        noProgressLimit: 3,
+        maxIterations: 10,
+      });
+
+      expect(result.exitCode).toBe(5);
+      expect(result.status).toBe("no-progress");
+      expect(result.iterations).toBe(3);
+      expect(result.details).toContain("3 réponses identiques");
+    });
+
+    it("should reset counter when response differs", async () => {
+      const mockAdapter = createMockAdapter(
+        "copilot",
+        { status: "available" },
+        [
+          { exitCode: 0, text: "Response A" },
+          { exitCode: 0, text: "Response A" },
+          { exitCode: 0, text: "Response B" }, // Reset ici
+          { exitCode: 0, text: "Response B" },
+          { exitCode: 0, text: "DONE" },
+        ],
+      );
+      vi.mocked(tryGetAdapterById).mockReturnValue(mockAdapter);
+
+      const result = await runLoop({
+        prompt: "Task",
+        backend: "copilot",
+        completionMode: "marker",
+        noProgressLimit: 3,
+        maxIterations: 10,
+      });
+
+      expect(result.status).toBe("done");
+      expect(result.iterations).toBe(5);
+    });
+
+    it("should use noProgressLimit from config when not specified", async () => {
+      vi.mocked(resolveConfig).mockResolvedValue({
+        backend: "copilot",
+        maxIterations: 10,
+        timeoutMs: 300000,
+        completionMode: "marker",
+        noProgressLimit: 2,
+      });
+      const mockAdapter = createMockAdapter(
+        "copilot",
+        { status: "available" },
+        [
+          { exitCode: 0, text: "Repeat" },
+          { exitCode: 0, text: "Repeat" },
+        ],
+      );
+      vi.mocked(tryGetAdapterById).mockReturnValue(mockAdapter);
+
+      const result = await runLoop({
+        prompt: "Task",
+        backend: "copilot",
+        completionMode: "marker",
+      });
+
+      expect(result.exitCode).toBe(5);
+      expect(result.status).toBe("no-progress");
+    });
+
+    it("should disable detection when noProgressLimit is 0", async () => {
+      const mockAdapter = createMockAdapter(
+        "copilot",
+        { status: "available" },
+        [
+          { exitCode: 0, text: "Same" },
+          { exitCode: 0, text: "Same" },
+          { exitCode: 0, text: "Same" },
+          { exitCode: 0, text: "Same" },
+          { exitCode: 0, text: "Same" },
+        ],
+      );
+      vi.mocked(tryGetAdapterById).mockReturnValue(mockAdapter);
+
+      const result = await runLoop({
+        prompt: "Task",
+        backend: "copilot",
+        completionMode: "marker",
+        noProgressLimit: 0,
+        maxIterations: 5,
+      });
+
+      expect(result.exitCode).toBe(4);
+      expect(result.status).toBe("max-iterations");
+    });
+
+    it("should override config noProgressLimit with option", async () => {
+      vi.mocked(resolveConfig).mockResolvedValue({
+        backend: "copilot",
+        maxIterations: 10,
+        timeoutMs: 300000,
+        completionMode: "marker",
+        noProgressLimit: 5,
+      });
+      const mockAdapter = createMockAdapter(
+        "copilot",
+        { status: "available" },
+        [
+          { exitCode: 0, text: "Repeat" },
+          { exitCode: 0, text: "Repeat" },
+        ],
+      );
+      vi.mocked(tryGetAdapterById).mockReturnValue(mockAdapter);
+
+      const result = await runLoop({
+        prompt: "Task",
+        backend: "copilot",
+        noProgressLimit: 2,
+      });
+
+      expect(result.exitCode).toBe(5);
+      expect(result.status).toBe("no-progress");
+      expect(result.iterations).toBe(2);
+    });
+  });
 });
