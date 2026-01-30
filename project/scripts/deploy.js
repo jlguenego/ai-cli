@@ -27,7 +27,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = join(__dirname, "..");
 
 // Configuration
-const ALLOWED_BRANCH = "main";
+const ALLOWED_BRANCH = "master";
 const NPM_REGISTRY = "https://registry.npmjs.org";
 
 // Parse arguments
