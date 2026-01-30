@@ -74,9 +74,9 @@
     },
     "09-integration-deploiement": {
       "status": "done",
-      "version": 1,
-      "updated_at": "2026-01-25T14:13:00Z",
-      "lines": 69,
+      "version": 2,
+      "updated_at": "2026-01-30T14:35:00Z",
+      "lines": 152,
       "depends_on": [
         "06-codage-guidelines",
         "07-refactoring-rules",
@@ -101,7 +101,8 @@
       "005-artifacts-et-redaction",
       "006-stack-outillage-node-tests-ci",
       "007-github-copilot-cli",
-      "008-prompt-source-fichier"
+      "008-prompt-source-fichier",
+      "009-deploy-npmjs"
     ]
   },
   "blocked_by_clarifications": false
