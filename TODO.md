@@ -71,7 +71,7 @@ _(aucune tâche en cours)_
   - 📁 Fichiers : `project/src/adapters/codex.ts`
   - 🔗 Dépend de : `id020`
 
-- [ ] `id023` — Créer le registre d'adaptateurs et la sélection par id
+- [x] `id023` — Créer le registre d'adaptateurs et la sélection par id
   - 📁 Fichiers : `project/src/adapters/registry.ts`
   - 🔗 Dépend de : `id021`, `id022`
 
