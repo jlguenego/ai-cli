@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
-> Dernière mise à jour : 2026-01-30 14:52
-> Progression : 17/24 tâches (71%)
+> Dernière mise à jour : 2026-01-30 15:00
+> Progression : 18/24 tâches (75%)
 
 ## 🎯 Objectif actuel
 
@@ -28,11 +28,6 @@ _(aucune tâche en cours)_
 ### Phase 1 — MVP Core
 
 #### Exécution itérative (loop)
-
-- [ ] `id050` — Implémenter le Runner loop avec garde-fous (maxIterations, timeout)
-  - 📁 Fichiers : `project/src/runner/loop.ts`
-  - 🔗 Dépend de : `id030`, `id042`
-  - 📋 Critères : Boucle prompt→parse→décision, respecter `maxIterations` et `timeoutMs`
 
 - [ ] `id051` — Implémenter la détection de non-progrès (noProgressLimit)
   - 📁 Fichiers : `project/src/runner/loop.ts`
@@ -139,3 +134,10 @@ _(aucune tâche en cours)_
 
 - [x] `id031` — Implémenter la commande `jlgcli run <prompt>` _(2026-01-30)_
   - 📁 Fichiers : `project/src/commands/run.ts`, `project/src/cli.ts`
+
+### Exécution itérative (loop)
+
+- [x] `id050` — Implémenter le Runner loop avec garde-fous (maxIterations, timeout) _(2026-01-30)_
+  - 📁 Fichiers : `project/src/runner/loop.ts`, `project/src/runner/types.ts`
+  - 🔗 Dépendait de : `id030`, `id042`
+  - 📋 Critères : Boucle prompt→parse→décision, respecter `maxIterations` et `timeoutMs`
