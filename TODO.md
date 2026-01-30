@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
-> Dernière mise à jour : 2026-01-30 16:10
-> Progression : 22/24 tâches (91%)
+> Dernière mise à jour : 2026-01-30 16:18
+> Progression : 24/24 tâches (100%) 🎉
 
 ## 🎯 Objectif actuel
 
@@ -59,13 +59,15 @@ _(aucune tâche en cours)_
   - 🔗 Dépend de : `id042`
   - 📋 Couverture : marker.ts 100%, json.ts 96.66%
 
-- [ ] `id071` — Ajouter les tests d'intégration pour le runner loop
-  - 📁 Fichiers : `project/tests/integration/loop.test.ts`
+- [x] `id071` — Ajouter les tests d'intégration pour le runner loop _(2026-01-30)_
+  - 📁 Fichiers : `project/tests/integration/loop.test.ts`, `project/tests/fixtures/mock-backend.js`
   - 🔗 Dépend de : `id052`
+  - 📋 Scénarios : INT-003 à INT-006c (marker, json, timeout, maxIterations, no-progress, invalid-json)
 
-- [ ] `id072` — Configurer la CI GitHub Actions (Windows + macOS + Linux)
-  - 📁 Fichiers : `project/.github/workflows/ci.yml`
+- [x] `id072` — Configurer la CI GitHub Actions (Windows + macOS + Linux) _(2026-01-30)_
+  - 📁 Fichiers : `.github/workflows/ci.yml`
   - 🔗 Dépend de : `id070`
+  - 📋 Matrice OS : ubuntu-latest, macos-latest, windows-latest ; Node 22 ; lint + typecheck + tests + coverage
   - 🔗 Référence : [clarifications/006-stack-outillage-node-tests-ci.md](clarifications/006-stack-outillage-node-tests-ci.md)
 
 ---
