@@ -1,19 +1,28 @@
 # TODO — @jlguenego/ai-cli
 
-> Dernière mise à jour : 2026-01-30 16:18
-> Progression : 24/24 tâches (100%) 🎉
+> Dernière mise à jour : 2026-01-30 14:45
+> Progression : 24/28 tâches (86%)
 
 ## 🎯 Objectif actuel
 
-**Phase 1 — MVP Core** : Avoir un CLI fonctionnel capable d'exécuter un prompt sur un backend et de boucler jusqu'à complétion.
+**Phase 2 — Déploiement NPM** : Mettre en place le script de déploiement Node.js pour publier sur npmjs.com.
 
-**Prochaine étape démontrable** : Pouvoir exécuter `jlgcli run "Hello"` et voir la réponse du backend.
+**Prochaine étape démontrable** : Pouvoir exécuter `npm run deploy` pour publier automatiquement le package.
 
 ---
 
 ## 🔥 Priorité haute (Quick Wins / Démontrable)
 
-_(aucune tâche prioritaire en attente)_
+- [ ] `id080` — Créer le script de déploiement `scripts/deploy.js`
+  - 📁 Fichiers : `project/scripts/deploy.js`
+  - 🔗 Dépend de : —
+  - 📋 Critères : Script Node.js (pas PowerShell), vérif branche, tests, build, version check, publish, tag git, changelog
+  - 🔗 Référence : [clarifications/009-deploy-npmjs-normalized.md](clarifications/009-deploy-npmjs-normalized.md)
+
+- [ ] `id081` — Ajouter le script "deploy" dans package.json
+  - 📁 Fichiers : `project/package.json`
+  - 🔗 Dépend de : `id080`
+  - 📋 Critères : `npm run deploy` et `npm run deploy -- --dry-run` fonctionnels
 
 ---
 
@@ -25,50 +34,17 @@ _(aucune tâche en cours)_
 
 ## 📋 Backlog
 
-### Phase 1 — MVP Core
+### Phase 2 — Déploiement & polish
 
-#### Exécution itérative (loop)
+- [ ] `id082` — Créer le fichier CHANGELOG.md initial
+  - 📁 Fichiers : `project/CHANGELOG.md`
+  - 🔗 Dépend de : `id080`
+  - 📋 Critères : Format Keep a Changelog, section Unreleased
 
-- [x] `id051` — Implémenter la détection de non-progrès (noProgressLimit) _(2026-01-30)_
-  - 📁 Fichiers : `project/src/runner/loop.ts`
-  - 🔗 Dépend de : `id050`
-  - 📋 Critères : Stopper si sortie identique N fois consécutives
-
-- [x] `id052` — Implémenter la commande `jlgcli loop <prompt>` _(2026-01-30)_
-  - 📁 Fichiers : `project/src/commands/loop.ts`, `project/src/cli.ts`
-  - 🔗 Dépend de : `id050`
-  - 📋 Critères : Options `--max-iterations`, `--timeout`, afficher progression
-
-#### Observabilité & artifacts
-
-- [x] `id060` — Implémenter le résumé final (humain + --json) _(2026-01-30)_
-  - 📁 Fichiers : `project/src/output/summary.ts`
-  - 🔗 Dépend de : `id031`
-  - 📋 Critères : Afficher backend, durée, itérations, statut ; supporter `--json`
-
-- [x] `id061` — Implémenter l'écriture des artifacts (--artifacts) _(2026-01-30)_
-  - 📁 Fichiers : `project/src/artifacts/writer.ts`
-  - 🔗 Dépend de : `id050`
-  - 📋 Critères : Écrire `.jlgcli/runs/<id>/` avec meta.json, transcript.ndjson, result.json
-  - 🔗 Référence : [clarifications/005-artifacts-et-redaction.md](clarifications/005-artifacts-et-redaction.md)
-
-### Phase 2 — Robustesse & polish
-
-- [x] `id070` — Ajouter les tests unitaires pour les parsers de complétion _(2026-01-30)_
-  - 📁 Fichiers : `project/tests/unit/completion-marker.test.ts`, `project/tests/unit/completion-json.test.ts`
-  - 🔗 Dépend de : `id042`
-  - 📋 Couverture : marker.ts 100%, json.ts 96.66%
-
-- [x] `id071` — Ajouter les tests d'intégration pour le runner loop _(2026-01-30)_
-  - 📁 Fichiers : `project/tests/integration/loop.test.ts`, `project/tests/fixtures/mock-backend.js`
-  - 🔗 Dépend de : `id052`
-  - 📋 Scénarios : INT-003 à INT-006c (marker, json, timeout, maxIterations, no-progress, invalid-json)
-
-- [x] `id072` — Configurer la CI GitHub Actions (Windows + macOS + Linux) _(2026-01-30)_
-  - 📁 Fichiers : `.github/workflows/ci.yml`
-  - 🔗 Dépend de : `id070`
-  - 📋 Matrice OS : ubuntu-latest, macos-latest, windows-latest ; Node 22 ; lint + typecheck + tests + coverage
-  - 🔗 Référence : [clarifications/006-stack-outillage-node-tests-ci.md](clarifications/006-stack-outillage-node-tests-ci.md)
+- [ ] `id083` — Documenter le processus de release dans README
+  - 📁 Fichiers : `project/README.md`
+  - 🔗 Dépend de : `id081`
+  - 📋 Critères : Section "Release" avec instructions pour mainteneurs
 
 ---
 
@@ -144,3 +120,44 @@ _(aucune tâche en cours)_
   - 📁 Fichiers : `project/src/runner/loop.ts`, `project/src/runner/types.ts`
   - 🔗 Dépendait de : `id030`, `id042`
   - 📋 Critères : Boucle prompt→parse→décision, respecter `maxIterations` et `timeoutMs`
+
+- [x] `id051` — Implémenter la détection de non-progrès (noProgressLimit) _(2026-01-30)_
+  - 📁 Fichiers : `project/src/runner/loop.ts`
+  - 🔗 Dépend de : `id050`
+  - 📋 Critères : Stopper si sortie identique N fois consécutives
+
+- [x] `id052` — Implémenter la commande `jlgcli loop <prompt>` _(2026-01-30)_
+  - 📁 Fichiers : `project/src/commands/loop.ts`, `project/src/cli.ts`
+  - 🔗 Dépend de : `id050`
+  - 📋 Critères : Options `--max-iterations`, `--timeout`, afficher progression
+
+### Observabilité & artifacts
+
+- [x] `id060` — Implémenter le résumé final (humain + --json) _(2026-01-30)_
+  - 📁 Fichiers : `project/src/output/summary.ts`
+  - 🔗 Dépend de : `id031`
+  - 📋 Critères : Afficher backend, durée, itérations, statut ; supporter `--json`
+
+- [x] `id061` — Implémenter l'écriture des artifacts (--artifacts) _(2026-01-30)_
+  - 📁 Fichiers : `project/src/artifacts/writer.ts`
+  - 🔗 Dépend de : `id050`
+  - 📋 Critères : Écrire `.jlgcli/runs/<id>/` avec meta.json, transcript.ndjson, result.json
+  - 🔗 Référence : [clarifications/005-artifacts-et-redaction.md](clarifications/005-artifacts-et-redaction.md)
+
+### Tests & CI
+
+- [x] `id070` — Ajouter les tests unitaires pour les parsers de complétion _(2026-01-30)_
+  - 📁 Fichiers : `project/tests/unit/completion-marker.test.ts`, `project/tests/unit/completion-json.test.ts`
+  - 🔗 Dépend de : `id042`
+  - 📋 Couverture : marker.ts 100%, json.ts 96.66%
+
+- [x] `id071` — Ajouter les tests d'intégration pour le runner loop _(2026-01-30)_
+  - 📁 Fichiers : `project/tests/integration/loop.test.ts`, `project/tests/fixtures/mock-backend.js`
+  - 🔗 Dépend de : `id052`
+  - 📋 Scénarios : INT-003 à INT-006c (marker, json, timeout, maxIterations, no-progress, invalid-json)
+
+- [x] `id072` — Configurer la CI GitHub Actions (Windows + macOS + Linux) _(2026-01-30)_
+  - 📁 Fichiers : `.github/workflows/ci.yml`
+  - 🔗 Dépend de : `id070`
+  - 📋 Matrice OS : ubuntu-latest, macos-latest, windows-latest ; Node 22 ; lint + typecheck + tests + coverage
+  - 🔗 Référence : [clarifications/006-stack-outillage-node-tests-ci.md](clarifications/006-stack-outillage-node-tests-ci.md)
