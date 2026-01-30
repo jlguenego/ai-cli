@@ -1,0 +1,1 @@
+le fichier asdf.txt existe-t-il ?
