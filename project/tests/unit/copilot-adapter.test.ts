@@ -81,7 +81,13 @@ describe("adapters/copilot", () => {
 
     const call = execaMock.mock.calls[1];
     expect(call?.[0]).toBe("copilot");
-    expect(call?.[1]).toEqual(["-p", "hello", "-s"]);
+    expect(call?.[1]).toEqual([
+      "-p",
+      "hello",
+      "-s",
+      "--allow-all-tools",
+      "--allow-all-paths",
+    ]);
 
     const options = call?.[2] as unknown as {
       env?: Record<string, string>;

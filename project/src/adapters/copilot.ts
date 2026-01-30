@@ -111,7 +111,17 @@ export class CopilotAdapter implements Adapter {
     if (detected.kind === "copilot") {
       // Utiliser l'option -p (--prompt) pour le mode non-interactif
       // et -s (--silent) pour n'avoir que la réponse de l'agent
-      const r = await tryExec(COPILOT_CMD, ["-p", args.prompt, "-s"], {
+      // --allow-all-tools: permet tous les outils sans confirmation (requis en non-interactif)
+      // --allow-all-paths: permet l'écriture de fichiers dans tous les répertoires
+      const copilotArgs = [
+        "-p",
+        args.prompt,
+        "-s",
+        "--allow-all-tools",
+        "--allow-all-paths",
+      ];
+
+      const r = await tryExec(COPILOT_CMD, copilotArgs, {
         cwd: args.cwd,
         env,
         timeoutMs: args.timeoutMs,
