@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// @ts-check
+/// <reference types="node" />
 /**
  * Backend mock pour tests d'intégration
  *
@@ -23,8 +25,15 @@ const args = process.argv.slice(2);
 const mode = args[0] || "marker-done";
 
 // Parse options
+/**
+ * @param {string} name
+ * @param {string} defaultValue
+ * @returns {string}
+ */
 function getOption(name, defaultValue) {
-  const arg = args.find((a) => a.startsWith(`--${name}=`));
+  const arg = args.find((/** @type {string} */ a) =>
+    a.startsWith(`--${name}=`),
+  );
   return arg ? arg.split("=")[1] : defaultValue;
 }
 
@@ -35,7 +44,7 @@ const summaryText = getOption("summary", "Task completed successfully");
 // Lire le prompt depuis stdin
 let input = "";
 process.stdin.setEncoding("utf-8");
-process.stdin.on("data", (chunk) => {
+process.stdin.on("data", (/** @type {string} */ chunk) => {
   input += chunk;
 });
 process.stdin.on("end", async () => {
