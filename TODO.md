@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
-> Dernière mise à jour : 2026-01-30 16:00
-> Progression : 20/24 tâches (83%)
+> Dernière mise à jour : 2026-01-30 16:10
+> Progression : 22/24 tâches (91%)
 
 ## 🎯 Objectif actuel
 
@@ -46,7 +46,7 @@ _(aucune tâche en cours)_
   - 🔗 Dépend de : `id031`
   - 📋 Critères : Afficher backend, durée, itérations, statut ; supporter `--json`
 
-- [ ] `id061` — Implémenter l'écriture des artifacts (--artifacts)
+- [x] `id061` — Implémenter l'écriture des artifacts (--artifacts) _(2026-01-30)_
   - 📁 Fichiers : `project/src/artifacts/writer.ts`
   - 🔗 Dépend de : `id050`
   - 📋 Critères : Écrire `.jlgcli/runs/<id>/` avec meta.json, transcript.ndjson, result.json
@@ -54,9 +54,10 @@ _(aucune tâche en cours)_
 
 ### Phase 2 — Robustesse & polish
 
-- [ ] `id070` — Ajouter les tests unitaires pour les parsers de complétion
+- [x] `id070` — Ajouter les tests unitaires pour les parsers de complétion _(2026-01-30)_
   - 📁 Fichiers : `project/tests/unit/completion-marker.test.ts`, `project/tests/unit/completion-json.test.ts`
   - 🔗 Dépend de : `id042`
+  - 📋 Couverture : marker.ts 100%, json.ts 96.66%
 
 - [ ] `id071` — Ajouter les tests d'intégration pour le runner loop
   - 📁 Fichiers : `project/tests/integration/loop.test.ts`

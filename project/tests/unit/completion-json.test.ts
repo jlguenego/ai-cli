@@ -161,5 +161,45 @@ Let me know if you need anything else.
       const result = parseJsonCompletion(text);
       expect(result).toEqual({ status: "done" });
     });
+
+    it("should ignore JSON arrays", () => {
+      const text = '[1,2,3]\n{"status":"done"}';
+      const result = parseJsonCompletion(text);
+      expect(result).toEqual({ status: "done" });
+    });
+
+    it("should handle multiline JSON with indentation", () => {
+      const json = `{
+        "status": "done",
+        "summary": "All good"
+      }`;
+      const result = parseJsonCompletion(json);
+      expect(result).toEqual({ status: "done", summary: "All good" });
+    });
+
+    it("should handle JSON in different code fence types", () => {
+      const text1 = '```\n{"status":"done"}\n```';
+      expect(parseJsonCompletion(text1)).toEqual({ status: "done" });
+
+      const text2 = '```javascript\nconst x = {"status":"continue"};\n```';
+      expect(parseJsonCompletion(text2)).toEqual({ status: "continue" });
+    });
+
+    it("should return error when summary is null", () => {
+      const result = parseJsonCompletion('{"status":"done","summary":null}');
+      expect(result).toEqual({ status: "error", error: "invalid-json" });
+    });
+
+    it("should handle deeply nested JSON (last valid wins)", () => {
+      const text = '{"a":{"b":{"status":"continue"}}}\n{"status":"done"}';
+      const result = parseJsonCompletion(text);
+      expect(result).toEqual({ status: "done" });
+    });
+
+    it("should handle JSON at end of very long text", () => {
+      const longText = "x".repeat(10000) + '\n{"status":"done"}';
+      const result = parseJsonCompletion(longText);
+      expect(result).toEqual({ status: "done" });
+    });
   });
 });

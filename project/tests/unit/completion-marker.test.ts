@@ -41,6 +41,12 @@ describe("parseMarkerCompletion", () => {
       expect(parseMarkerCompletion("UNDONE")).toEqual({ status: "continue" });
       expect(parseMarkerCompletion("DONENESS")).toEqual({ status: "continue" });
     });
+
+    it("when text has mixed line endings (CRLF)", () => {
+      expect(parseMarkerCompletion("Line1\r\nLine2\r\nNot done")).toEqual({
+        status: "continue",
+      });
+    });
   });
 
   describe("should return 'done'", () => {
@@ -57,6 +63,24 @@ describe("parseMarkerCompletion", () => {
       expect(parseMarkerCompletion("DONE\n")).toEqual({ status: "done" });
       expect(parseMarkerCompletion("DONE\r\n")).toEqual({ status: "done" });
       expect(parseMarkerCompletion("DONE\n\n")).toEqual({ status: "done" });
+    });
+
+    it("when DONE follows CRLF line endings", () => {
+      expect(parseMarkerCompletion("Line1\r\nLine2\r\nDONE")).toEqual({
+        status: "done",
+      });
+      expect(parseMarkerCompletion("Output\r\nDONE\r\n")).toEqual({
+        status: "done",
+      });
+    });
+
+    it("when text contains special characters before DONE", () => {
+      expect(parseMarkerCompletion("émoji 🎉\nDONE")).toEqual({
+        status: "done",
+      });
+      expect(parseMarkerCompletion("中文字符\nDONE")).toEqual({
+        status: "done",
+      });
     });
 
     it("when DONE is on the last non-empty line after content", () => {
