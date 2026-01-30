@@ -1,10 +1,14 @@
 import { describe, it, expect } from "vitest";
+import { createRequire } from "node:module";
 import { VERSION, NAME, CLI_NAME } from "../../src/index.js";
+
+const require = createRequire(import.meta.url);
+const pkg = require("../../package.json") as { version: string };
 
 describe("CLI Module", () => {
   describe("Exports", () => {
     it("should export VERSION matching package.json", () => {
-      expect(VERSION).toBe("0.1.0");
+      expect(VERSION).toBe(pkg.version);
     });
 
     it("should export NAME as @jlguenego/ai-cli", () => {
