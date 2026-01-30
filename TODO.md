@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
-> Dernière mise à jour : 2026-01-30 14:32
-> Progression : 16/24 tâches (67%)
+> Dernière mise à jour : 2026-01-30 14:52
+> Progression : 17/24 tâches (71%)
 
 ## 🎯 Objectif actuel
 
@@ -26,13 +26,6 @@ _(aucune tâche en cours)_
 ## 📋 Backlog
 
 ### Phase 1 — MVP Core
-
-#### Protocole de complétion
-
-- [ ] `id042` — Créer le dispatcher de complétion selon config
-  - 📁 Fichiers : `project/src/completion/index.ts`, `project/src/completion/types.ts`
-  - 🔗 Dépend de : `id040`, `id041`
-  - 📋 Critères : `parseCompletion(text, mode)` → `CompletionResult`
 
 #### Exécution itérative (loop)
 
@@ -84,6 +77,9 @@ _(aucune tâche en cours)_
 ## ✅ Terminé
 
 ### Protocole de complétion
+
+- [x] `id042` — Créer le dispatcher de complétion selon config _(2026-01-30)_
+  - 📁 Fichiers : `project/src/completion/index.ts`, `project/tests/unit/completion.test.ts`
 
 - [x] `id041` — Implémenter le parser de complétion mode `json` _(2026-01-30)_
   - 📁 Fichiers : `project/src/completion/json.ts`
