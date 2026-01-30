@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
-> Dernière mise à jour : 2026-01-30 14:30
-> Progression : 14/24 tâches (58%)
+> Dernière mise à jour : 2026-01-30 14:25
+> Progression : 15/24 tâches (63%)
 
 ## 🎯 Objectif actuel
 
@@ -28,12 +28,6 @@ _(aucune tâche en cours)_
 ### Phase 1 — MVP Core
 
 #### Protocole de complétion
-
-- [ ] `id040` — Implémenter le parser de complétion mode `marker` (DONE)
-  - 📁 Fichiers : `project/src/completion/marker.ts`
-  - 🔗 Dépend de : —
-  - 📋 Critères : Détecter `DONE` en dernière ligne, retourner `done|continue`
-  - 🔗 Référence : [clarifications/002-contrat-completion-json.md](clarifications/002-contrat-completion-json.md)
 
 - [ ] `id041` — Implémenter le parser de complétion mode `json`
   - 📁 Fichiers : `project/src/completion/json.ts`
@@ -94,6 +88,11 @@ _(aucune tâche en cours)_
 ---
 
 ## ✅ Terminé
+
+### Protocole de complétion
+
+- [x] `id040` — Implémenter le parser de complétion mode `marker` (DONE) _(2026-01-30)_
+  - 📁 Fichiers : `project/src/completion/marker.ts`, `project/src/completion/types.ts`
 
 ### Setup & CLI de base
 
