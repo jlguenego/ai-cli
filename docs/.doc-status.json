@@ -100,7 +100,8 @@
       "004-strategie-config-paths",
       "005-artifacts-et-redaction",
       "006-stack-outillage-node-tests-ci",
-      "007-github-copilot-cli"
+      "007-github-copilot-cli",
+      "008-prompt-source-fichier"
     ]
   },
   "blocked_by_clarifications": false

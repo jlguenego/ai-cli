@@ -125,9 +125,11 @@
 #### US-004 : Exécuter un prompt simple
 
 **Given** un backend est sélectionné
-**When** je lance `jlgcli run "Explique ce repo"`
-**Then** la sortie de l’assistant est imprimée
+**When** je lance `jlgcli run ./prompt.txt`
+**Then** la sortie de l'assistant est imprimée
 **And** le code retour est 0 si le backend a réussi
+
+> Note : Le prompt est toujours un fichier (cf. [clarifications/008-prompt-source-fichier.md](../clarifications/008-prompt-source-fichier.md))
 
 ---
 
@@ -144,7 +146,7 @@
 #### US-005 : Boucler jusqu’à `DONE`
 
 **Given** `maxIterations=5`
-**When** je lance `jlgcli loop "Fais X et termine par DONE"`
+**When** je lance `jlgcli loop ./task.md`
 **Then** le CLI s’arrête dès qu’un `DONE` est détecté
 
 **Given** la complétion n’arrive pas

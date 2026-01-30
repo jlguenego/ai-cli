@@ -162,17 +162,20 @@ Exécuter un prompt sur un backend choisi (config ou `--backend`), streamer la s
 
 #### Comportement attendu
 
-| Entrée                      | Traitement                         | Sortie                              |
-| --------------------------- | ---------------------------------- | ----------------------------------- |
-| `run "..."`                 | Résout backend + exécute `runOnce` | Sortie assistant + code 0 si succès |
-| `run "..." --backend codex` | Surcharge backend                  | Sortie assistant                    |
-| `run "..." --quiet`         | Réduit les logs                    | Sortie minimale                     |
+| Entrée                             | Traitement                      | Sortie                              |
+| ---------------------------------- | ------------------------------- | ----------------------------------- |
+| `run ./prompt.txt`                 | Lit fichier + exécute `runOnce` | Sortie assistant + code 0 si succès |
+| `run ./prompt.txt --backend codex` | Surcharge backend               | Sortie assistant                    |
+| `run ./prompt.txt --quiet`         | Réduit les logs                 | Sortie minimale                     |
+| `run -`                            | Lit stdin                       | Sortie assistant                    |
+
+> Note : Le prompt est toujours un fichier (cf. [clarifications/008-prompt-source-fichier.md](../clarifications/008-prompt-source-fichier.md))
 
 #### Cas limites et erreurs
 
 | Cas                    | Comportement attendu                                                  |
 | ---------------------- | --------------------------------------------------------------------- |
-| Prompt vide            | Erreur + aide d’usage                                                 |
+| Fichier introuvable    | Erreur + exit 66 (`EX_NOINPUT`)                                       |
 | Backend renvoie erreur | Message clair + code 1                                                |
 | Sortie énorme          | Stream + tronquer uniquement les logs UI, pas le transcript artifacts |
 
@@ -207,11 +210,11 @@ Boucler automatiquement :
 
 #### Comportement attendu
 
-| Entrée                          | Traitement                      | Sortie                  |
-| ------------------------------- | ------------------------------- | ----------------------- |
-| `loop "... DONE"`               | Boucle jusqu’à détection `DONE` | Résumé + code 0         |
-| `loop "..." --max-iterations 3` | Limite stricte                  | Si non terminé → code 4 |
-| `loop "..." --timeout 2m`       | Timeout global                  | Si dépassé → code 75    |
+| Entrée                              | Traitement                      | Sortie                  |
+| ----------------------------------- | ------------------------------- | ----------------------- |
+| `loop ./task.md`                    | Boucle jusqu'à détection `DONE` | Résumé + code 0         |
+| `loop ./task.md --max-iterations 3` | Limite stricte                  | Si non terminé → code 4 |
+| `loop ./task.md --timeout 2m`       | Timeout global                  | Si dépassé → code 75    |
 
 #### Cas limites et erreurs
 

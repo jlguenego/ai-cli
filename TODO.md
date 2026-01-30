@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
-> Dernière mise à jour : 2026-01-25
-> Progression : 8/24 tâches (33%)
+> Dernière mise à jour : 2026-01-30
+> Progression : 13/24 tâches (54%)
 
 ## 🎯 Objectif actuel
 
@@ -81,7 +81,7 @@ _(aucune tâche en cours)_
 
 #### Exécution one-shot
 
-- [ ] `id030` — Implémenter le Runner pour exécution one-shot
+- [x] `id030` — Implémenter le Runner pour exécution one-shot
   - 📁 Fichiers : `project/src/runner/run.ts`
   - 🔗 Dépend de : `id023`
 

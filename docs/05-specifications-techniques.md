@@ -134,8 +134,10 @@ erDiagram
 | --------------------------------- | ------------------------ | ----------------- |
 | `jlgcli backends`                 | Liste backends + statuts | N/A               |
 | `jlgcli config get/set/show/path` | Lecture/écriture config  | N/A               |
-| `jlgcli run <prompt>`             | Exécution one-shot       | Backend dépendant |
-| `jlgcli loop <prompt>`            | Exécution itérative      | Backend dépendant |
+| `jlgcli run <fichier>`            | Exécution one-shot       | Backend dépendant |
+| `jlgcli loop <fichier>`           | Exécution itérative      | Backend dépendant |
+
+> Note : `<fichier>` est un chemin vers un fichier prompt (ou `-` pour stdin). Cf. [clarifications/008-prompt-source-fichier.md](../clarifications/008-prompt-source-fichier.md)
 
 ### Contrats d'API (internes)
 
