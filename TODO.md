@@ -75,7 +75,7 @@ _(aucune tâche en cours)_
   - 📁 Fichiers : `project/src/adapters/registry.ts`
   - 🔗 Dépend de : `id021`, `id022`
 
-- [ ] `id024` — Mettre à jour `jlgcli backends` avec détection réelle (available/missing)
+- [x] `id024` — Mettre à jour `jlgcli backends` avec détection réelle (available/missing)
   - 📁 Fichiers : `project/src/commands/backends.ts`
   - 🔗 Dépend de : `id023`
 
