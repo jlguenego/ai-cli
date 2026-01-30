@@ -67,7 +67,7 @@ _(aucune tâche en cours)_
   - 📁 Fichiers : `project/src/adapters/copilot.ts`, `project/tests/unit/copilot-adapter.test.ts`
   - 🔗 Dépend de : `id020`
 
-- [ ] `id022` — Implémenter l'adaptateur Codex (isAvailable + runOnce)
+- [x] `id022` — Implémenter l'adaptateur Codex (isAvailable + runOnce)
   - 📁 Fichiers : `project/src/adapters/codex.ts`
   - 🔗 Dépend de : `id020`
 
