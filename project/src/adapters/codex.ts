@@ -23,6 +23,12 @@ function looksUnauthenticated(output: string): boolean {
   );
 }
 
+function looksMissingBinary(output: string): boolean {
+  return /\b(command\s+not\s+found|not\s+recognized\s+as\s+an\s+internal\s+or\s+external\s+command|no\s+such\s+file\s+or\s+directory|cannot\s+find\s+the\s+file)\b/i.test(
+    output,
+  );
+}
+
 type ExecResult = {
   exitCode: number;
   stdout: string;
@@ -69,6 +75,12 @@ async function detectAvailability(): Promise<
 
     if (looksUnauthenticated(combined)) {
       return { kind: "unauthenticated", details: combined };
+    }
+
+    // Certains environnements (Windows/shell wrappers) peuvent renvoyer un exitCode != 0
+    // avec un message "command not found" au lieu d'une erreur ENOENT.
+    if (looksMissingBinary(combined)) {
+      return { kind: "missing", details: "Commande introuvable: codex" };
     }
 
     // Best-effort: si la commande répond mais exitCode != 0 sans indice clair,

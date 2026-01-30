@@ -6,9 +6,6 @@ import type {
   AdapterRunOnceResult,
 } from "./types.js";
 
-const GH_CMD = "gh";
-const GH_COPILOT_VERSION_ARGS = ["copilot", "--version"];
-
 const COPILOT_CMD = "copilot";
 const COPILOT_VERSION_ARGS = ["--version"];
 
@@ -62,47 +59,16 @@ async function tryExec(
 }
 
 async function detectBackend(): Promise<
-  | { kind: "gh"; details?: string }
   | { kind: "copilot"; details?: string }
   | { kind: "missing"; details?: string }
   | { kind: "unauthenticated"; details?: string }
 > {
-  let ghProbeDetails: string | undefined;
-
-  try {
-    const r = await tryExec(GH_CMD, GH_COPILOT_VERSION_ARGS, {});
-    const combined = `${r.stdout}\n${r.stderr}`.trim();
-
-    if (r.exitCode === 0) {
-      return { kind: "gh" };
-    }
-
-    if (looksUnauthenticated(combined)) {
-      return { kind: "unauthenticated", details: combined };
-    }
-
-    if (looksMissingCommand(combined)) {
-      // gh présent mais sous-commande copilot absente → tenter fallback "copilot" binaire
-      ghProbeDetails = combined || "gh copilot: commande inconnue";
-    } else {
-      // Best-effort : si gh répond mais exitCode != 0 sans indice clair
-      return { kind: "gh", details: combined || `exitCode=${r.exitCode}` };
-    }
-  } catch (error) {
-    if (!isEnoent(error)) {
-      const message = error instanceof Error ? error.message : String(error);
-      return { kind: "missing", details: message };
-    }
-  }
-
   try {
     const r = await tryExec(COPILOT_CMD, COPILOT_VERSION_ARGS, {});
     const combined = `${r.stdout}\n${r.stderr}`.trim();
 
     if (r.exitCode === 0) {
-      return ghProbeDetails
-        ? { kind: "copilot", details: ghProbeDetails }
-        : { kind: "copilot" };
+      return { kind: "copilot" };
     }
 
     if (looksUnauthenticated(combined)) {
@@ -111,17 +77,13 @@ async function detectBackend(): Promise<
 
     return {
       kind: "copilot",
-      details: [ghProbeDetails, combined || `exitCode=${r.exitCode}`]
-        .filter(Boolean)
-        .join("\n"),
+      details: combined || `exitCode=${r.exitCode}`,
     };
   } catch (error) {
     if (isEnoent(error)) {
       return {
         kind: "missing",
-        details: ghProbeDetails
-          ? `Commandes introuvables: copilot\n${ghProbeDetails}`
-          : "Commandes introuvables: gh/copilot",
+        details: "Commande introuvable: copilot",
       };
     }
     const message = error instanceof Error ? error.message : String(error);
@@ -140,7 +102,6 @@ export class CopilotAdapter implements Adapter {
         return { status: "missing", details: detected.details };
       case "unauthenticated":
         return { status: "unauthenticated", details: detected.details };
-      case "gh":
       case "copilot":
         return detected.details
           ? { status: "available", details: detected.details }
@@ -152,21 +113,6 @@ export class CopilotAdapter implements Adapter {
     const detected = await detectBackend();
 
     const env = { ...process.env, ...args.env };
-
-    // Best-effort: utiliser gh copilot si dispo, sinon un binaire copilot.
-    if (detected.kind === "gh") {
-      const r = await tryExec(
-        GH_CMD,
-        ["copilot", "suggest", "-t", "shell", args.prompt],
-        { cwd: args.cwd, env, timeoutMs: args.timeoutMs },
-      );
-
-      return {
-        exitCode: r.exitCode,
-        text: r.stdout.trim() ? r.stdout : r.stderr,
-        raw: r,
-      };
-    }
 
     if (detected.kind === "copilot") {
       const r = await tryExec(COPILOT_CMD, ["suggest", args.prompt], {

@@ -11,10 +11,10 @@ describe("adapters/copilot", () => {
     execaMock.mockReset();
   });
 
-  it("should return missing when gh and copilot are not found", async () => {
-    execaMock
-      .mockRejectedValueOnce(Object.assign(new Error("not found"), { code: "ENOENT" }))
-      .mockRejectedValueOnce(Object.assign(new Error("not found"), { code: "ENOENT" }));
+  it("should return missing when copilot is not found", async () => {
+    execaMock.mockRejectedValueOnce(
+      Object.assign(new Error("not found"), { code: "ENOENT" }),
+    );
 
     const { CopilotAdapter } = await import("../../src/adapters/copilot.js");
     const adapter = new CopilotAdapter();
@@ -24,30 +24,11 @@ describe("adapters/copilot", () => {
     );
   });
 
-  it("should return missing when gh exists but 'copilot' command is unknown", async () => {
-    execaMock
-      .mockResolvedValueOnce({
-        exitCode: 1,
-        stdout: "",
-        stderr: "unknown command 'copilot'",
-      })
-      .mockRejectedValueOnce(
-        Object.assign(new Error("not found"), { code: "ENOENT" }),
-      );
-
-    const { CopilotAdapter } = await import("../../src/adapters/copilot.js");
-    const adapter = new CopilotAdapter();
-
-    await expect(adapter.isAvailable()).resolves.toEqual(
-      expect.objectContaining({ status: "missing" }),
-    );
-  });
-
-  it("should return unauthenticated when gh indicates login is required", async () => {
+  it("should return unauthenticated when copilot indicates login is required", async () => {
     execaMock.mockResolvedValueOnce({
       exitCode: 1,
       stdout: "",
-      stderr: "Please run: gh auth login",
+      stderr: "Please login to Copilot",
     });
 
     const { CopilotAdapter } = await import("../../src/adapters/copilot.js");
@@ -58,8 +39,12 @@ describe("adapters/copilot", () => {
     );
   });
 
-  it("should return available when gh copilot --version exits 0", async () => {
-    execaMock.mockResolvedValueOnce({ exitCode: 0, stdout: "1.2.3", stderr: "" });
+  it("should return available when copilot --version exits 0", async () => {
+    execaMock.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: "1.2.3",
+      stderr: "",
+    });
 
     const { CopilotAdapter } = await import("../../src/adapters/copilot.js");
     const adapter = new CopilotAdapter();
@@ -70,9 +55,13 @@ describe("adapters/copilot", () => {
   });
 
   it("runOnce should pass cwd/timeout and merge env", async () => {
-    // detectBackend(): gh copilot --version
-    execaMock.mockResolvedValueOnce({ exitCode: 0, stdout: "1.2.3", stderr: "" });
-    // runOnce(): gh copilot suggest ...
+    // detectBackend(): copilot --version
+    execaMock.mockResolvedValueOnce({
+      exitCode: 0,
+      stdout: "1.2.3",
+      stderr: "",
+    });
+    // runOnce(): copilot suggest ...
     execaMock.mockResolvedValueOnce({ exitCode: 0, stdout: "ok", stderr: "" });
 
     const { CopilotAdapter } = await import("../../src/adapters/copilot.js");
@@ -87,11 +76,12 @@ describe("adapters/copilot", () => {
 
     expect(result.exitCode).toBe(0);
 
-    expect(execaMock.mock.calls[0]?.[0]).toBe("gh");
-    expect(execaMock.mock.calls[0]?.[1]).toEqual(["copilot", "--version"]);
+    expect(execaMock.mock.calls[0]?.[0]).toBe("copilot");
+    expect(execaMock.mock.calls[0]?.[1]).toEqual(["--version"]);
 
     const call = execaMock.mock.calls[1];
-    expect(call?.[0]).toBe("gh");
+    expect(call?.[0]).toBe("copilot");
+    expect(call?.[1]).toEqual(["suggest", "hello"]);
 
     const options = call?.[2] as unknown as {
       env?: Record<string, string>;

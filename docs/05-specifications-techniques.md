@@ -165,6 +165,8 @@ erDiagram
 | Codex CLI                  | CLI local | process spawn (argv) | Login/clé côté utilisateur     |
 | Claude Code CLI (hors MVP) | CLI local | process spawn (argv) | Login/clé côté utilisateur     |
 
+**Note (Copilot)** : pour le backend `copilot`, la commande attendue est `copilot` (binaire direct dans le PATH), et **pas** `gh copilot`.
+
 ---
 
 ## Exigences non-fonctionnelles

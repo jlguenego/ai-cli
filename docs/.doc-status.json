@@ -1,126 +1,107 @@
 ﻿{
-    "project":  "@jlguenego/ai-cli (CLI: jlgcli)",
-    "brief_source":  "input/brief.md",
-    "brief_modified_at":  "2026-01-25T11:35:09.9463453Z",
-    "created_at":  "2026-01-25T11:38:24.4310419Z",
-    "updated_at":  "2026-01-25T14:21:36Z",
-    "documents":  {
-                      "00-vision":  {
-                                        "status":  "done",
-                                        "version":  1,
-                                        "updated_at":  "2026-01-25T14:13:00Z",
-                                        "lines":  105,
-                                        "depends_on":  [
-
-                                                       ]
-                                    },
-                      "01-personas-parcours":  {
-                                                   "status":  "done",
-                                                   "version":  1,
-                                                   "updated_at":  "2026-01-25T11:42:03.7585759Z",
-                                                   "lines":  112,
-                                                   "depends_on":  [
-
-                                                                  ]
-                                               },
-                      "02-user-stories-flows":  {
-                                                    "status":  "done",
-                                                    "version":  1,
-                                                    "updated_at":  "2026-01-25T14:13:00Z",
-                                                    "lines":  174,
-                                                    "depends_on":  [
-
-                                                                   ]
-                                                },
-                      "03-specifications-fonctionnelles":  {
-                                                               "status":  "done",
-                                                               "version":  1,
-                                                               "updated_at":  "2026-01-25T14:13:00Z",
-                                                               "lines":  232,
-                                                               "depends_on":  [
-                                                                                  "00-vision",
-                                                                                  "01-personas-parcours",
-                                                                                  "02-user-stories-flows"
-                                                                              ]
-                                                           },
-                      "04-decisions-architectures":  {
-                                                         "status":  "done",
-                                                         "version":  1,
-                                                         "updated_at":  "2026-01-25T14:14:08Z",
-                                                         "lines":  238,
-                                                         "depends_on":  [
-                                                                            "03-specifications-fonctionnelles"
-                                                                        ]
-                                                     },
-                      "05-specifications-techniques":  {
-                                                           "status":  "done",
-                                                           "version":  1,
-                                                           "updated_at":  "2026-01-25T14:13:00Z",
-                                                           "lines":  142,
-                                                           "depends_on":  [
-                                                                              "04-decisions-architectures"
-                                                                          ]
-                                                       },
-                      "06-codage-guidelines":  {
-                                                   "status":  "done",
-                                                   "version":  1,
-                                                   "updated_at":  "2026-01-25T14:13:00Z",
-                                                   "lines":  115,
-                                                   "depends_on":  [
-                                                                      "05-specifications-techniques"
-                                                                  ]
-                                               },
-                      "07-refactoring-rules":  {
-                                                   "status":  "done",
-                                                   "version":  1,
-                                                   "updated_at":  "2026-01-25T13:16:06Z",
-                                                   "lines":  93,
-                                                   "depends_on":  [
-                                                                      "05-specifications-techniques"
-                                                                  ]
-                                               },
-                      "08-tests-verification":  {
-                                                    "status":  "done",
-                                                    "version":  1,
-                                                    "updated_at":  "2026-01-25T14:13:00Z",
-                                                    "lines":  104,
-                                                    "depends_on":  [
-                                                                       "05-specifications-techniques"
-                                                                   ]
-                                                },
-                      "09-integration-deploiement":  {
-                                                         "status":  "done",
-                                                         "version":  1,
-                                                         "updated_at":  "2026-01-25T14:13:00Z",
-                                                         "lines":  69,
-                                                         "depends_on":  [
-                                                                            "06-codage-guidelines",
-                                                                            "07-refactoring-rules",
-                                                                            "08-tests-verification"
-                                                                        ]
-                                                     },
-                      "10-maintenance-exploitation":  {
-                                                          "status":  "done",
-                                                          "version":  1,
-                                                          "updated_at":  "2026-01-25T14:13:00Z",
-                                                          "lines":  96,
-                                                          "depends_on":  [
-                                                                             "09-integration-deploiement"
-                                                                         ]
-                                                      }
-                  },
-    "clarifications":  {
-                           "pending":  [
-
-                                       ],
-                           "resolved":  [
-                                            "001-perimetre-backends-mvp",
-                                            "002-contrat-completion-json",
-                                            "003-exit-codes-et-erreurs",
-                                            "004-strategie-config-paths",
-                                            "005-artifacts-et-redaction",
-                                            "006-stack-outillage-node-tests-ci"
-                                        ]
-                       },
-    "blocked_by_clarifications":  false
+  "project": "@jlguenego/ai-cli (CLI: jlgcli)",
+  "brief_source": "input/brief.md",
+  "brief_modified_at": "2026-01-25T11:35:09.9463453Z",
+  "created_at": "2026-01-25T11:38:24.4310419Z",
+  "updated_at": "2026-01-30T12:18:48.6374067Z",
+  "documents": {
+    "00-vision": {
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T14:13:00Z",
+      "lines": 105,
+      "depends_on": []
+    },
+    "01-personas-parcours": {
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T11:42:03.7585759Z",
+      "lines": 112,
+      "depends_on": []
+    },
+    "02-user-stories-flows": {
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T14:13:00Z",
+      "lines": 174,
+      "depends_on": []
+    },
+    "03-specifications-fonctionnelles": {
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T14:13:00Z",
+      "lines": 232,
+      "depends_on": [
+        "00-vision",
+        "01-personas-parcours",
+        "02-user-stories-flows"
+      ]
+    },
+    "04-decisions-architectures": {
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T14:14:08Z",
+      "lines": 238,
+      "depends_on": ["03-specifications-fonctionnelles"]
+    },
+    "05-specifications-techniques": {
+      "status": "done",
+      "version": 2,
+      "updated_at": "2026-01-30T12:18:48.6374067Z",
+      "lines": 143,
+      "depends_on": ["04-decisions-architectures"]
+    },
+    "06-codage-guidelines": {
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T14:13:00Z",
+      "lines": 115,
+      "depends_on": ["05-specifications-techniques"]
+    },
+    "07-refactoring-rules": {
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T13:16:06Z",
+      "lines": 93,
+      "depends_on": ["05-specifications-techniques"]
+    },
+    "08-tests-verification": {
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T14:13:00Z",
+      "lines": 104,
+      "depends_on": ["05-specifications-techniques"]
+    },
+    "09-integration-deploiement": {
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T14:13:00Z",
+      "lines": 69,
+      "depends_on": [
+        "06-codage-guidelines",
+        "07-refactoring-rules",
+        "08-tests-verification"
+      ]
+    },
+    "10-maintenance-exploitation": {
+      "status": "done",
+      "version": 1,
+      "updated_at": "2026-01-25T14:13:00Z",
+      "lines": 96,
+      "depends_on": ["09-integration-deploiement"]
+    }
+  },
+  "clarifications": {
+    "pending": [],
+    "resolved": [
+      "001-perimetre-backends-mvp",
+      "002-contrat-completion-json",
+      "003-exit-codes-et-erreurs",
+      "004-strategie-config-paths",
+      "005-artifacts-et-redaction",
+      "006-stack-outillage-node-tests-ci",
+      "007-github-copilot-cli"
+    ]
+  },
+  "blocked_by_clarifications": false
 }

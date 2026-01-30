@@ -54,6 +54,22 @@ describe("adapters/codex", () => {
     );
   });
 
+  it("should return missing when output looks like command-not-found", async () => {
+    execaMock.mockResolvedValueOnce({
+      exitCode: 1,
+      stdout: "",
+      stderr:
+        "'codex' is not recognized as an internal or external command, operable program or batch file.",
+    });
+
+    const { CodexAdapter } = await import("../../src/adapters/codex.js");
+    const adapter = new CodexAdapter();
+
+    await expect(adapter.isAvailable()).resolves.toEqual(
+      expect.objectContaining({ status: "missing" }),
+    );
+  });
+
   it("runOnce should pass cwd/timeout, merge env and use input", async () => {
     // detectAvailability(): codex --version
     execaMock.mockResolvedValueOnce({
