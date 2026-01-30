@@ -13,7 +13,7 @@
 
 ## 🔥 Priorité haute (Quick Wins / Démontrable)
 
-- [ ] `id080` — Créer le script de déploiement `scripts/deploy.js`
+- [x] `id080` — Créer le script de déploiement `scripts/deploy.js` _(2026-01-30)_
   - 📁 Fichiers : `project/scripts/deploy.js`
   - 🔗 Dépend de : —
   - 📋 Critères : Script Node.js (pas PowerShell), vérif branche, tests, build, version check, publish, tag git, changelog
