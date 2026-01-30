@@ -29,11 +29,11 @@ function looksMissingBinary(output: string): boolean {
   );
 }
 
-type ExecResult = {
+interface ExecResult {
   exitCode: number;
   stdout: string;
   stderr: string;
-};
+}
 
 async function tryExec(
   command: string,

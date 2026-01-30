@@ -23,17 +23,11 @@ function looksUnauthenticated(output: string): boolean {
   );
 }
 
-function looksMissingCommand(output: string): boolean {
-  return /\b(unknown\s+command|no\s+such\s+command|not\s+a\s+gh\s+command)\b/i.test(
-    output,
-  );
-}
-
-type ExecResult = {
+interface ExecResult {
   exitCode: number;
   stdout: string;
   stderr: string;
-};
+}
 
 async function tryExec(
   command: string,

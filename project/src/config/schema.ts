@@ -51,6 +51,7 @@ export interface UserConfig {
  * Configuration projet (même structure que UserConfig)
  * Surcharge les valeurs de la config utilisateur
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ProjectConfig extends UserConfig {}
 
 /**

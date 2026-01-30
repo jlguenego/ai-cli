@@ -5,7 +5,7 @@
  */
 
 import { Command } from "commander";
-import { VERSION, NAME, CLI_NAME } from "./index.js";
+import { VERSION, CLI_NAME } from "./index.js";
 import { registerBackendsCommand } from "./commands/backends.js";
 import { registerConfigCommand } from "./commands/config.js";
 import { registerRunCommand } from "./commands/run.js";

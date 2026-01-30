@@ -3,7 +3,7 @@
  * Affiche la liste des backends supportés.
  */
 
-import { Command } from "commander";
+import type { Command } from "commander";
 import { getAdapters } from "../adapters/registry.js";
 import type {
   AdapterAvailabilityStatus,

@@ -2,7 +2,7 @@
  * Commande `jlgcli config` — Gestion de la configuration
  */
 
-import { Command } from "commander";
+import type { Command } from "commander";
 import {
   CONFIG_KEYS,
   PROJECT_CONFIG_FILENAME,

@@ -3,7 +3,6 @@ import { resolveConfig } from "../config/loader.js";
 import type { RunOptions, RunResult, RunStatus } from "./types.js";
 
 // Exit codes conformes à clarifications/003
-const EXIT_SUCCESS = 0;
 const EXIT_BACKEND_MISSING = 2;
 const EXIT_BACKEND_UNAUTHENTICATED = 6;
 const EXIT_USAGE = 64; // EX_USAGE - backend inconnu ou unsupported

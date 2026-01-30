@@ -1,8 +1,3 @@
-import type {
-  AdapterId,
-  AdapterAvailabilityStatus,
-} from "../adapters/types.js";
-
 /**
  * Statut final d'une exécution
  */

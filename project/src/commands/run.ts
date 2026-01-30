@@ -3,7 +3,7 @@
  * Exécute un prompt (lu depuis un fichier) sur un backend IA (one-shot).
  */
 
-import { Command } from "commander";
+import type { Command } from "commander";
 import { readFile } from "node:fs/promises";
 import { runOnce } from "../runner/run.js";
 
