@@ -195,9 +195,16 @@ describe("writeArtifacts", () => {
       transcript: [],
     };
 
-    // Chemin invalide (caractères interdits sur Windows et Unix)
+    // Utiliser un chemin qui échouera sur tous les OS:
+    // - Sur Unix: /dev/null est un fichier, pas un répertoire
+    // - Sur Windows: /dev/null/test échouera car chemin invalide
+    const invalidPath =
+      process.platform === "win32"
+        ? 'Z:\\nonexistent\\path\\invalid<>:"|?*'
+        : "/dev/null/impossible/path";
+
     const writeResult = await writeArtifacts(result, {
-      cwd: 'Z:\\nonexistent\\path\\<>:"|?*',
+      cwd: invalidPath,
       command: "loop",
       prompt: "test",
       startedAt: new Date().toISOString(),
