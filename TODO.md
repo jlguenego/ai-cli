@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
-> Dernière mise à jour : 2026-01-30 15:37
-> Progression : 19/24 tâches (79%)
+> Dernière mise à jour : 2026-01-30 16:00
+> Progression : 20/24 tâches (83%)
 
 ## 🎯 Objectif actuel
 
@@ -41,7 +41,7 @@ _(aucune tâche en cours)_
 
 #### Observabilité & artifacts
 
-- [ ] `id060` — Implémenter le résumé final (humain + --json)
+- [x] `id060` — Implémenter le résumé final (humain + --json) _(2026-01-30)_
   - 📁 Fichiers : `project/src/output/summary.ts`
   - 🔗 Dépend de : `id031`
   - 📋 Critères : Afficher backend, durée, itérations, statut ; supporter `--json`

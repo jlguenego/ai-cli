@@ -6,6 +6,10 @@
 import type { Command } from "commander";
 import { readFile } from "node:fs/promises";
 import { runOnce } from "../runner/run.js";
+import {
+  formatRunHumanSummary,
+  formatRunJsonSummary,
+} from "../output/summary.js";
 
 // Exit code pour fichier introuvable (cf. clarifications/003)
 const EX_NOINPUT = 66;
@@ -15,6 +19,7 @@ const EX_NOINPUT = 66;
  */
 export interface RunCommandOptions {
   backend?: string;
+  json?: boolean;
 }
 
 /**
@@ -94,14 +99,23 @@ export async function runAction(
     backend: options.backend,
   });
 
-  if (result.exitCode === 0) {
-    // Succès : afficher le texte sur stdout
-    console.log(result.text);
+  if (options.json) {
+    // Mode JSON : uniquement le JSON sur stdout
+    console.log(JSON.stringify(formatRunJsonSummary(result), null, 2));
   } else {
-    // Erreur : afficher sur stderr
-    console.error(result.text);
-    if (result.details) {
-      console.error(result.details);
+    // Mode humain : texte sur stdout, résumé sur stderr
+    if (result.exitCode === 0) {
+      console.log(result.text);
+    } else {
+      console.error(result.text);
+      if (result.details) {
+        console.error(result.details);
+      }
+    }
+
+    // Afficher le résumé sur stderr
+    for (const line of formatRunHumanSummary(result)) {
+      console.error(line);
     }
   }
 
@@ -116,5 +130,6 @@ export function registerRunCommand(program: Command): void {
     .command("run <fichier-prompt>")
     .description("Exécute un prompt (fichier) sur un backend IA")
     .option("-b, --backend <id>", "Backend à utiliser (copilot, codex, claude)")
+    .option("--json", "Sortie au format JSON (machine-readable)")
     .action(runAction);
 }

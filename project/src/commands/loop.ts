@@ -7,6 +7,10 @@ import type { Command } from "commander";
 import { readFile } from "node:fs/promises";
 import { runLoop } from "../runner/loop.js";
 import type { TranscriptEntry } from "../runner/types.js";
+import {
+  formatLoopHumanSummary,
+  formatLoopJsonSummary,
+} from "../output/summary.js";
 
 // Exit code pour fichier introuvable (cf. clarifications/003)
 const EX_NOINPUT = 66;
@@ -19,6 +23,7 @@ export interface LoopCommandOptions {
   maxIterations?: string;
   timeout?: string;
   completionMode?: "marker" | "json";
+  json?: boolean;
 }
 
 /**
@@ -114,20 +119,31 @@ export async function loopAction(
     maxIterations,
     timeoutMs,
     completionMode: options.completionMode,
-    onIteration: (entry) => {
-      // Affichage progressif sur stderr
-      console.error(formatIterationProgress(entry));
-    },
+    onIteration: options.json
+      ? undefined
+      : (entry) => {
+          // Affichage progressif sur stderr (seulement en mode humain)
+          console.error(formatIterationProgress(entry));
+        },
   });
 
-  if (result.exitCode === 0) {
-    // Succès : afficher le texte sur stdout
-    console.log(result.text);
+  if (options.json) {
+    // Mode JSON : uniquement le JSON sur stdout
+    console.log(JSON.stringify(formatLoopJsonSummary(result), null, 2));
   } else {
-    // Erreur : afficher sur stderr
-    console.error(`[${result.status}] ${result.text.slice(0, 200)}`);
-    if (result.details) {
-      console.error(result.details);
+    // Mode humain : texte sur stdout, résumé sur stderr
+    if (result.exitCode === 0) {
+      console.log(result.text);
+    } else {
+      console.error(`[${result.status}] ${result.text.slice(0, 200)}`);
+      if (result.details) {
+        console.error(result.details);
+      }
+    }
+
+    // Afficher le résumé sur stderr
+    for (const line of formatLoopHumanSummary(result)) {
+      console.error(line);
     }
   }
 
@@ -148,5 +164,6 @@ export function registerLoopCommand(program: Command): void {
       "--completion-mode <mode>",
       "Mode de détection de complétion (marker, json)",
     )
+    .option("--json", "Sortie au format JSON (machine-readable)")
     .action(loopAction);
 }
