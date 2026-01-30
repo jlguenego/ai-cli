@@ -19,7 +19,7 @@
   - 📋 Critères : Script Node.js (pas PowerShell), vérif branche, tests, build, version check, publish, tag git, changelog
   - 🔗 Référence : [clarifications/009-deploy-npmjs-normalized.md](clarifications/009-deploy-npmjs-normalized.md)
 
-- [ ] `id081` — Ajouter le script "deploy" dans package.json
+- [x] `id081` — Ajouter le script "deploy" dans package.json _(2026-01-30)_
   - 📁 Fichiers : `project/package.json`
   - 🔗 Dépend de : `id080`
   - 📋 Critères : `npm run deploy` et `npm run deploy -- --dry-run` fonctionnels
