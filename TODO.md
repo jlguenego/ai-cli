@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
-> Dernière mise à jour : 2026-01-30 14:25
-> Progression : 15/24 tâches (63%)
+> Dernière mise à jour : 2026-01-30 14:32
+> Progression : 16/24 tâches (67%)
 
 ## 🎯 Objectif actuel
 
@@ -28,12 +28,6 @@ _(aucune tâche en cours)_
 ### Phase 1 — MVP Core
 
 #### Protocole de complétion
-
-- [ ] `id041` — Implémenter le parser de complétion mode `json`
-  - 📁 Fichiers : `project/src/completion/json.ts`
-  - 🔗 Dépend de : —
-  - 📋 Critères : Extraire dernier objet JSON valide, valider schéma `{status, summary?, next?}`
-  - 🔗 Référence : [clarifications/002-contrat-completion-json.md](clarifications/002-contrat-completion-json.md)
 
 - [ ] `id042` — Créer le dispatcher de complétion selon config
   - 📁 Fichiers : `project/src/completion/index.ts`, `project/src/completion/types.ts`
@@ -90,6 +84,9 @@ _(aucune tâche en cours)_
 ## ✅ Terminé
 
 ### Protocole de complétion
+
+- [x] `id041` — Implémenter le parser de complétion mode `json` _(2026-01-30)_
+  - 📁 Fichiers : `project/src/completion/json.ts`
 
 - [x] `id040` — Implémenter le parser de complétion mode `marker` (DONE) _(2026-01-30)_
   - 📁 Fichiers : `project/src/completion/marker.ts`, `project/src/completion/types.ts`
