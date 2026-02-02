@@ -160,6 +160,7 @@ describe("output/summary", () => {
         status: "success",
         exitCode: 0,
         durationMs: 1500,
+        cost: 0,
         text: "Hello World",
       });
     });
@@ -215,6 +216,7 @@ describe("output/summary", () => {
         status: "done",
         exitCode: 0,
         durationMs: 30000,
+        cost: 0,
         iterations: 5,
         text: "Final response",
       });

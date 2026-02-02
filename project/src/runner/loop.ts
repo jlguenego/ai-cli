@@ -1,7 +1,8 @@
 import { tryGetAdapterById } from "../adapters/registry.js";
 import { resolveConfig } from "../config/loader.js";
 import { parseCompletion } from "../completion/index.js";
-import type { CompletionMode } from "../config/schema.js";
+import { createVerbosityConfig, logCost } from "../output/verbosity.js";
+import type { CompletionMode, VerbosityLevel } from "../config/schema.js";
 import type {
   LoopOptions,
   LoopResult,
@@ -75,29 +76,6 @@ function loopStatusForAvailability(
 }
 
 /**
- * Crée un résultat d'erreur de loop
- */
-function createErrorResult(
-  backendId: string,
-  status: LoopStatus,
-  exitCode: number,
-  details: string,
-  startTime: number,
-  transcript: TranscriptEntry[],
-): LoopResult {
-  return {
-    exitCode,
-    text: details,
-    backend: backendId,
-    status,
-    iterations: transcript.length,
-    durationMs: Date.now() - startTime,
-    transcript,
-    details,
-  };
-}
-
-/**
  * Exécute un prompt de manière itérative avec garde-fous
  *
  * Boucle prompt→adapter→parse jusqu'à :
@@ -122,17 +100,46 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
     cwd,
   } = await resolveLoopOptions(options);
 
+  // Créer la config de verbosité
+  const verbosityLevel: VerbosityLevel = options.verbosity ?? 3;
+  const verbosityConfig = createVerbosityConfig(verbosityLevel);
+
+  // Le coût total (les backends ne le fournissent pas encore)
+  const totalCost = 0;
+
+  // Helper pour créer un résultat avec affichage du coût
+  const createResultWithCost = (
+    status: LoopStatus,
+    exitCode: number,
+    text: string,
+    opts?: { summary?: string; details?: string },
+  ): LoopResult => {
+    logCost(verbosityConfig, totalCost);
+    return {
+      exitCode,
+      text,
+      backend: backendId,
+      status,
+      iterations: transcript.length,
+      durationMs: Date.now() - startTime,
+      transcript,
+      cost: totalCost,
+      summary: opts?.summary,
+      details: opts?.details,
+    };
+  };
+
   // Vérifier si le backend existe
   const adapter = tryGetAdapterById(backendId);
 
   if (!adapter) {
-    return createErrorResult(
-      backendId,
+    return createResultWithCost(
       "backend-unknown",
       EXIT_USAGE,
       `Backend inconnu: ${backendId}. Les backends supportés sont: copilot, codex, claude`,
-      startTime,
-      transcript,
+      {
+        details: `Backend inconnu: ${backendId}. Les backends supportés sont: copilot, codex, claude`,
+      },
     );
   }
 
@@ -140,13 +147,13 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
   const availability = await adapter.isAvailable();
 
   if (availability.status !== "available") {
-    return createErrorResult(
-      backendId,
+    const details =
+      availability.details ?? `Backend ${backendId} non disponible`;
+    return createResultWithCost(
       loopStatusForAvailability(availability.status),
       exitCodeForAvailability(availability.status),
-      availability.details ?? `Backend ${backendId} non disponible`,
-      startTime,
-      transcript,
+      details,
+      { details },
     );
   }
 
@@ -164,16 +171,9 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
     // Vérifier le timeout global
     const elapsed = Date.now() - startTime;
     if (elapsed >= timeoutMs) {
-      return {
-        exitCode: EXIT_TIMEOUT,
-        text: lastResponse,
-        backend: backendId,
-        status: "timeout",
-        iterations: transcript.length,
-        durationMs: elapsed,
-        transcript,
+      return createResultWithCost("timeout", EXIT_TIMEOUT, lastResponse, {
         details: `Timeout global atteint après ${elapsed}ms`,
-      };
+      });
     }
 
     // Calculer le timeout restant pour cette itération
@@ -219,31 +219,22 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
       previousResponse = result.text;
 
       if (consecutiveIdenticalCount >= noProgressLimit) {
-        return {
-          exitCode: EXIT_NO_PROGRESS,
-          text: result.text,
-          backend: backendId,
-          status: "no-progress",
-          iterations: transcript.length,
-          durationMs: Date.now() - startTime,
-          transcript,
-          details: `Arrêt après ${consecutiveIdenticalCount} réponses identiques consécutives`,
-        };
+        return createResultWithCost(
+          "no-progress",
+          EXIT_NO_PROGRESS,
+          result.text,
+          {
+            details: `Arrêt après ${consecutiveIdenticalCount} réponses identiques consécutives`,
+          },
+        );
       }
     }
 
     // Vérifier si le backend a échoué
     if (result.exitCode !== 0) {
-      return {
-        exitCode: result.exitCode,
-        text: result.text,
-        backend: backendId,
-        status: "error",
-        iterations: transcript.length,
-        durationMs: Date.now() - startTime,
-        transcript,
+      return createResultWithCost("error", result.exitCode, result.text, {
         details: `Backend a retourné exit code ${result.exitCode}`,
-      };
+      });
     }
 
     // Parser la complétion
@@ -256,32 +247,18 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
         summary = completion.summary;
       }
 
-      return {
-        exitCode: EXIT_SUCCESS,
-        text: result.text,
-        backend: backendId,
-        status: "done",
-        iterations: transcript.length,
-        durationMs: Date.now() - startTime,
-        transcript,
+      return createResultWithCost("done", EXIT_SUCCESS, result.text, {
         summary,
-      };
+      });
     }
 
     if (completion.status === "error") {
       // Mode json avec JSON invalide
       const errorMessage =
         "error" in completion ? completion.error : "invalid-json";
-      return {
-        exitCode: EXIT_DATAERR,
-        text: result.text,
-        backend: backendId,
-        status: "invalid-json",
-        iterations: transcript.length,
-        durationMs: Date.now() - startTime,
-        transcript,
+      return createResultWithCost("invalid-json", EXIT_DATAERR, result.text, {
         details: errorMessage,
-      };
+      });
     }
 
     // status === 'continue' : préparer la prochaine itération
@@ -293,14 +270,10 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
   }
 
   // maxIterations atteint
-  return {
-    exitCode: EXIT_MAX_ITERATIONS,
-    text: lastResponse,
-    backend: backendId,
-    status: "max-iterations",
-    iterations: transcript.length,
-    durationMs: Date.now() - startTime,
-    transcript,
-    details: `Limite de ${maxIterations} itérations atteinte`,
-  };
+  return createResultWithCost(
+    "max-iterations",
+    EXIT_MAX_ITERATIONS,
+    lastResponse,
+    { details: `Limite de ${maxIterations} itérations atteinte` },
+  );
 }

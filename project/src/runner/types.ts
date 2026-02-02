@@ -9,6 +9,8 @@ export type RunStatus =
   | "backend-unknown"
   | "error";
 
+import type { VerbosityLevel } from "../config/schema.js";
+
 /**
  * Options pour l'exécution one-shot
  */
@@ -23,6 +25,8 @@ export interface RunOptions {
   env?: Record<string, string | undefined>;
   /** Timeout en millisecondes */
   timeoutMs?: number;
+  /** Niveau de verbosité (0-3, défaut: 3) */
+  verbosity?: VerbosityLevel;
 }
 
 /**
@@ -41,6 +45,8 @@ export interface RunResult {
   durationMs: number;
   /** Détails additionnels en cas d'erreur */
   details?: string;
+  /** Coût en dollars (0 si non applicable) */
+  cost?: number;
 }
 
 // ============================================================================
@@ -100,6 +106,8 @@ export interface LoopOptions {
   noProgressLimit?: number;
   /** Callback appelé à chaque itération (pour affichage progressif) */
   onIteration?: (entry: TranscriptEntry) => void;
+  /** Niveau de verbosité (0-3, défaut: 3) */
+  verbosity?: VerbosityLevel;
 }
 
 /**
@@ -124,4 +132,6 @@ export interface LoopResult {
   summary?: string;
   /** Détails additionnels en cas d'erreur */
   details?: string;
+  /** Coût total en dollars (0 si non applicable) */
+  cost?: number;
 }

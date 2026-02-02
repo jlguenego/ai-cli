@@ -10,6 +10,7 @@ import {
   formatRunHumanSummary,
   formatRunJsonSummary,
 } from "../output/summary.js";
+import type { VerbosityLevel } from "../config/schema.js";
 
 // Exit code pour fichier introuvable (cf. clarifications/003)
 const EX_NOINPUT = 66;
@@ -95,9 +96,15 @@ export async function runAction(
     return; // Pour les tests où process.exit est mocké
   }
 
+  // Parser le niveau de verbosité
+  const verbosity = (
+    options.verbosity ? parseInt(options.verbosity, 10) : 3
+  ) as VerbosityLevel;
+
   const result = await runOnce({
     prompt,
     backend: options.backend,
+    verbosity,
   });
 
   if (options.json) {

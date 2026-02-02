@@ -14,6 +14,8 @@ export interface RunJsonSummary {
   exitCode: number;
   /** Durée en millisecondes */
   durationMs: number;
+  /** Coût en dollars (toujours présent, RG-018) */
+  cost: number;
   /** Texte de sortie du backend */
   text: string;
   /** Détails additionnels (erreurs) */
@@ -32,6 +34,8 @@ export interface LoopJsonSummary {
   exitCode: number;
   /** Durée totale en millisecondes */
   durationMs: number;
+  /** Coût total en dollars (toujours présent, RG-018) */
+  cost: number;
   /** Nombre d'itérations effectuées */
   iterations: number;
   /** Texte de la dernière réponse */

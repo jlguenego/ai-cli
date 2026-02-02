@@ -129,6 +129,7 @@ describe("Run Command", () => {
       expect(runOnce).toHaveBeenCalledWith({
         prompt: "Hello AI",
         backend: "copilot",
+        verbosity: 3,
       });
     });
 
@@ -223,6 +224,7 @@ describe("Run Command", () => {
       expect(runOnce).toHaveBeenCalledWith({
         prompt: "Prompt",
         backend: undefined,
+        verbosity: 3,
       });
     });
   });

@@ -115,6 +115,7 @@ export function formatRunJsonSummary(result: RunResult): RunJsonSummary {
     status: result.status,
     exitCode: result.exitCode,
     durationMs: result.durationMs,
+    cost: result.cost ?? 0,
     text: result.text,
   };
 
@@ -136,6 +137,7 @@ export function formatLoopJsonSummary(result: LoopResult): LoopJsonSummary {
     status: result.status,
     exitCode: result.exitCode,
     durationMs: result.durationMs,
+    cost: result.cost ?? 0,
     iterations: result.iterations,
     text: result.text,
   };

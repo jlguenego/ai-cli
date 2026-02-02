@@ -11,6 +11,7 @@ import {
   formatLoopHumanSummary,
   formatLoopJsonSummary,
 } from "../output/summary.js";
+import type { VerbosityLevel } from "../config/schema.js";
 
 // Exit code pour fichier introuvable (cf. clarifications/003)
 const EX_NOINPUT = 66;
@@ -114,12 +115,18 @@ export async function loopAction(
     : undefined;
   const timeoutMs = options.timeout ? parseInt(options.timeout, 10) : undefined;
 
+  // Parser le niveau de verbosité
+  const verbosity = (
+    options.verbosity ? parseInt(options.verbosity, 10) : 3
+  ) as VerbosityLevel;
+
   const result = await runLoop({
     prompt,
     backend: options.backend,
     maxIterations,
     timeoutMs,
     completionMode: options.completionMode,
+    verbosity,
     onIteration: options.json
       ? undefined
       : (entry) => {

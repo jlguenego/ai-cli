@@ -1,5 +1,7 @@
 import { tryGetAdapterById } from "../adapters/registry.js";
 import { resolveConfig } from "../config/loader.js";
+import { createVerbosityConfig, logCost } from "../output/verbosity.js";
+import type { VerbosityLevel } from "../config/schema.js";
 import type { RunOptions, RunResult, RunStatus } from "./types.js";
 
 // Exit codes conformes à clarifications/003
@@ -60,10 +62,18 @@ export async function runOnce(options: RunOptions): Promise<RunResult> {
   const backendId = await resolveBackendId(options.backend);
   const cwd = options.cwd ?? process.cwd();
 
+  // Créer la config de verbosité
+  const verbosityLevel: VerbosityLevel = options.verbosity ?? 3;
+  const verbosityConfig = createVerbosityConfig(verbosityLevel);
+
+  // Le coût est actuellement 0 (les backends ne le fournissent pas encore)
+  const cost = 0;
+
   // Vérifier si le backend existe
   const adapter = tryGetAdapterById(backendId);
 
   if (!adapter) {
+    logCost(verbosityConfig, cost);
     return {
       exitCode: EXIT_USAGE,
       text: `Backend inconnu: ${backendId}`,
@@ -71,6 +81,7 @@ export async function runOnce(options: RunOptions): Promise<RunResult> {
       status: "backend-unknown",
       durationMs: Date.now() - startTime,
       details: `Les backends supportés sont: copilot, codex, claude`,
+      cost,
     };
   }
 
@@ -78,6 +89,7 @@ export async function runOnce(options: RunOptions): Promise<RunResult> {
   const availability = await adapter.isAvailable();
 
   if (availability.status !== "available") {
+    logCost(verbosityConfig, cost);
     return {
       exitCode: exitCodeForAvailability(availability.status),
       text: availability.details ?? `Backend ${backendId} non disponible`,
@@ -85,6 +97,7 @@ export async function runOnce(options: RunOptions): Promise<RunResult> {
       status: runStatusForAvailability(availability.status),
       durationMs: Date.now() - startTime,
       details: availability.details,
+      cost,
     };
   }
 
@@ -96,11 +109,15 @@ export async function runOnce(options: RunOptions): Promise<RunResult> {
     timeoutMs: options.timeoutMs,
   });
 
+  // Afficher le coût (RG-018)
+  logCost(verbosityConfig, cost);
+
   return {
     exitCode: result.exitCode,
     text: result.text,
     backend: backendId,
     status: result.exitCode === 0 ? "success" : "error",
     durationMs: Date.now() - startTime,
+    cost,
   };
 }

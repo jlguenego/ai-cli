@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
-> Dernière mise à jour : 2026-02-02 18:48
-> Progression : 27/34 tâches (79%)
+> Dernière mise à jour : 2026-02-02 19:01
+> Progression : 28/34 tâches (82%)
 
 ## 🎯 Objectif actuel
 
@@ -42,7 +42,7 @@ _(aucune tâche en cours)_
 
 ### Phase 3 — Verbosité (suite)
 
-- [ ] `id093` — Implémenter l'affichage du coût (toujours affiché, même nul)
+- [x] `id093` — Implémenter l'affichage du coût (toujours affiché, même nul) _(2026-02-02)_
   - 📁 Fichiers : `project/src/output/verbosity.ts`, `project/src/runner/run.ts`, `project/src/runner/loop.ts`
   - 🔗 Dépend de : `id092`
   - 📋 Critères : Format `💰 Coût : X.XX $`, affiché même si 0.00 — RG-018
