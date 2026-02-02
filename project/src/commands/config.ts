@@ -9,11 +9,13 @@ import {
   USER_CONFIG_PATH,
   VALID_BACKENDS,
   VALID_COMPLETION_MODES,
+  VALID_VERBOSITY_LEVELS,
   isValidConfig,
   type BackendId,
   type CompletionMode,
   type ConfigKey,
   type UserConfig,
+  type VerbosityLevel,
 } from "../config/schema.js";
 import {
   getConfigValue,
@@ -68,6 +70,16 @@ export function parseConfigValue(
       return raw as CompletionMode;
     }
 
+    case "verbosity": {
+      const value = Number(raw);
+      if (!VALID_VERBOSITY_LEVELS.includes(value as VerbosityLevel)) {
+        throw new Error(
+          `Valeur invalide pour verbosity: "${raw}" (attendu: 0, 1, 2 ou 3)`,
+        );
+      }
+      return value as VerbosityLevel;
+    }
+
     case "maxIterations":
     case "timeoutMs":
     case "noProgressLimit": {
@@ -84,6 +96,12 @@ export function parseConfigValue(
       }
 
       return value;
+    }
+
+    default: {
+      // Exhaustive check: si une nouvelle clé est ajoutée, TypeScript signalera une erreur ici
+      const _exhaustiveCheck: never = key;
+      throw new Error(`Clé de configuration non gérée: "${_exhaustiveCheck}"`);
     }
   }
 }
