@@ -19,7 +19,7 @@
   - 📋 Critères : Type `verbosity: 0 | 1 | 2 | 3`, défaut 3, validation
   - 🔗 Référence : [clarifications/010-verbosite-normalized.md](clarifications/010-verbosite-normalized.md), [docs/05-specifications-techniques.md](docs/05-specifications-techniques.md)
 
-- [ ] `id091` — Créer l'interface VerbosityConfig et les helpers de logging
+- [x] `id091` — Créer l'interface VerbosityConfig et les helpers de logging _(2026-02-02)_
   - 📁 Fichiers : `project/src/output/verbosity.ts`
   - 🔗 Dépend de : `id090`
   - 📋 Critères : `log(level, msg)`, `logCost(cost)`, `streamResponse(chunk)` selon spécs
