@@ -8,6 +8,7 @@ description: Créer l'interface VerbosityConfig et les helpers de logging pour l
 ## Objectif
 
 Implémenter le module de verbosité qui fournit :
+
 - L'interface `VerbosityConfig` pour configurer le comportement de sortie
 - Les fonctions helpers `log()`, `logCost()` et `streamResponse()` pour afficher les traces selon le niveau de verbosité
 
@@ -26,11 +27,11 @@ Le CLI `jlgcli` doit supporter 4 niveaux de verbosité (0-3) pour contrôler fin
 
 ## Fichiers impactés
 
-| Fichier                             | Action   | Description                                        |
-| ----------------------------------- | -------- | -------------------------------------------------- |
-| `project/src/output/verbosity.ts`   | Créer    | Module principal avec interface et helpers         |
-| `project/src/output/index.ts`       | Modifier | Exporter le nouveau module                         |
-| `project/tests/unit/verbosity.test.ts` | Créer | Tests unitaires (optionnel, couvert par id096)   |
+| Fichier                                | Action   | Description                                    |
+| -------------------------------------- | -------- | ---------------------------------------------- |
+| `project/src/output/verbosity.ts`      | Créer    | Module principal avec interface et helpers     |
+| `project/src/output/index.ts`          | Modifier | Exporter le nouveau module                     |
+| `project/tests/unit/verbosity.test.ts` | Créer    | Tests unitaires (optionnel, couvert par id096) |
 
 ## Critères d'acceptation
 
@@ -47,12 +48,12 @@ Le CLI `jlgcli` doit supporter 4 niveaux de verbosité (0-3) pour contrôler fin
 
 ### Niveaux de verbosité
 
-| Niveau | Nom        | Comportement                                                                |
-| ------ | ---------- | --------------------------------------------------------------------------- |
-| 0      | Silencieux | Résultat final uniquement                                                   |
-| 1      | Minimal    | Résultat + coût                                                             |
-| 2      | Normal     | Résultat + coût + indicateur de progression                                 |
-| 3      | Debug      | Résultat + coût + prompts complets + réponses stream + infos techniques     |
+| Niveau | Nom        | Comportement                                                            |
+| ------ | ---------- | ----------------------------------------------------------------------- |
+| 0      | Silencieux | Résultat final uniquement                                               |
+| 1      | Minimal    | Résultat + coût                                                         |
+| 2      | Normal     | Résultat + coût + indicateur de progression                             |
+| 3      | Debug      | Résultat + coût + prompts complets + réponses stream + infos techniques |
 
 ### Règles métier
 
