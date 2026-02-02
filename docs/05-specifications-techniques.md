@@ -78,6 +78,7 @@ erDiagram
     int timeoutMs
     string completionMode
     int noProgressLimit
+    int verbosity
   }
 
   PROJECT_CONFIG {
@@ -87,6 +88,7 @@ erDiagram
     int timeoutMs
     string completionMode
     int noProgressLimit
+    int verbosity
   }
 
   RUN {
@@ -116,6 +118,7 @@ erDiagram
 | USER_CONFIG    | timeoutMs       | int    | >0                                                                 | Timeout global pour `loop`                  |
 | USER_CONFIG    | completionMode  | string | marker\|json                                                       | Protocole de complétion                     |
 | USER_CONFIG    | noProgressLimit | int    | >=0                                                                | Arrêt si répétitions                        |
+| USER_CONFIG    | verbosity       | int    | 0\|1\|2\|3                                                         | Niveau de verbosité (défaut: 3)             |
 | PROJECT_CONFIG | \*              | \*     | idem                                                               | Overrides au niveau projet                  |
 | RUN            | id              | string | unique                                                             | Identifiant de run (`YYYYMMDD-HHMMSS-rand`) |
 | RUN            | status          | string | done\|error\|timeout\|max-iterations\|backend-missing\|no-progress | Cause d’arrêt normalisée                    |
@@ -139,6 +142,17 @@ erDiagram
 
 > Note : `<fichier>` est un chemin vers un fichier prompt (ou `-` pour stdin). Cf. [clarifications/008-prompt-source-fichier.md](../clarifications/008-prompt-source-fichier.md)
 
+### Options globales (run/loop)
+
+| Option        | Type   | Défaut | Description                                                      |
+| ------------- | ------ | ------ | ---------------------------------------------------------------- |
+| `--backend`   | string | config | Surcharge le backend par défaut                                  |
+| `--verbosity` | int    | 3      | Niveau de verbosité (0=silencieux, 1=minimal, 2=normal, 3=debug) |
+| `--json`      | bool   | false  | Sortie JSON sur stdout                                           |
+| `--artifacts` | bool   | false  | Écrire les artefacts dans `.jlgcli/runs/<id>/`                   |
+
+> Référence verbosité : [clarification 010-verbosite](../clarifications/010-verbosite-normalized.md)
+
 ### Contrats d'API (internes)
 
 #### `Adapter` (contrat minimal)
@@ -156,6 +170,35 @@ erDiagram
 - Mode `marker` : `DONE` si et seulement si une **dernière ligne exactement** `DONE`.
 - Mode `json` : extraire le **dernier objet JSON valide** de la sortie et valider un schéma minimal `{ status, summary?, next? }`.
   - Si aucun JSON valide n’est trouvé (ou schéma invalide) : arrêt en erreur **invalid-json** (recommandation : `EX_DATAERR = 65`).
+
+#### `VerbosityConfig` (contrat)
+
+> Référence : [clarification 010-verbosite](../clarifications/010-verbosite-normalized.md)
+
+```typescript
+interface VerbosityConfig {
+  level: 0 | 1 | 2 | 3; // Niveau de verbosité
+  showCost: boolean; // Toujours true (RG-018)
+  showPrompt: boolean; // true si level >= 3
+  streamResponse: boolean; // true si level >= 3
+  showTechnical: boolean; // true si level >= 3
+}
+
+const DEFAULT_VERBOSITY = 3; // Mode debug par défaut (RG-017)
+```
+
+| Niveau | showCost | showPrompt | streamResponse | showTechnical |
+| ------ | -------- | ---------- | -------------- | ------------- |
+| 0      | ✅       | ❌         | ❌             | ❌            |
+| 1      | ✅       | ❌         | ❌             | ❌            |
+| 2      | ✅       | ❌         | ❌             | ❌            |
+| 3      | ✅       | ✅         | ✅             | ✅            |
+
+**Format d'affichage du coût** :
+
+```
+💰 Coût : 0.00 $
+```
 
 ---
 

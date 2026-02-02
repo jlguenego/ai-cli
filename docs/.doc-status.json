@@ -28,9 +28,9 @@
     },
     "03-specifications-fonctionnelles": {
       "status": "done",
-      "version": 1,
-      "updated_at": "2026-01-25T14:13:00Z",
-      "lines": 232,
+      "version": 2,
+      "updated_at": "2026-02-02T12:00:00Z",
+      "lines": 378,
       "depends_on": [
         "00-vision",
         "01-personas-parcours",
@@ -46,16 +46,16 @@
     },
     "05-specifications-techniques": {
       "status": "done",
-      "version": 2,
-      "updated_at": "2026-01-30T12:18:48.6374067Z",
-      "lines": 143,
+      "version": 3,
+      "updated_at": "2026-02-02T12:10:00Z",
+      "lines": 230,
       "depends_on": ["04-decisions-architectures"]
     },
     "06-codage-guidelines": {
       "status": "done",
-      "version": 1,
-      "updated_at": "2026-01-25T14:13:00Z",
-      "lines": 115,
+      "version": 2,
+      "updated_at": "2026-02-02T12:15:00Z",
+      "lines": 200,
       "depends_on": ["05-specifications-techniques"]
     },
     "07-refactoring-rules": {
@@ -102,7 +102,8 @@
       "006-stack-outillage-node-tests-ci",
       "007-github-copilot-cli",
       "008-prompt-source-fichier",
-      "009-deploy-npmjs"
+      "009-deploy-npmjs",
+      "010-verbosite"
     ]
   },
   "blocked_by_clarifications": false

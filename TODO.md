@@ -1,28 +1,34 @@
 # TODO — @jlguenego/ai-cli
 
-> Dernière mise à jour : 2026-01-30 14:45
-> Progression : 24/28 tâches (86%)
+> Dernière mise à jour : 2026-02-02 13:00
+> Progression : 26/34 tâches (76%)
 
 ## 🎯 Objectif actuel
 
-**Phase 2 — Déploiement NPM** : Mettre en place le script de déploiement Node.js pour publier sur npmjs.com.
+**Phase 3 — Verbosité & Traçabilité** : Implémenter le système de verbosité avec niveaux 0-3 et affichage du coût.
 
-**Prochaine étape démontrable** : Pouvoir exécuter `npm run deploy` pour publier automatiquement le package.
+**Prochaine étape démontrable** : Pouvoir exécuter `jlgcli run --verbosity=0|1|2|3` avec comportement différencié.
 
 ---
 
 ## 🔥 Priorité haute (Quick Wins / Démontrable)
 
-- [x] `id080` — Créer le script de déploiement `scripts/deploy.js` _(2026-01-30)_
-  - 📁 Fichiers : `project/scripts/deploy.js`
+- [ ] `id090` — Ajouter le champ `verbosity` dans le schéma de configuration
+  - 📁 Fichiers : `project/src/config/schema.ts`
   - 🔗 Dépend de : —
-  - 📋 Critères : Script Node.js (pas PowerShell), vérif branche, tests, build, version check, publish, tag git, changelog
-  - 🔗 Référence : [clarifications/009-deploy-npmjs-normalized.md](clarifications/009-deploy-npmjs-normalized.md)
+  - 📋 Critères : Type `verbosity: 0 | 1 | 2 | 3`, défaut 3, validation
+  - 🔗 Référence : [clarifications/010-verbosite-normalized.md](clarifications/010-verbosite-normalized.md), [docs/05-specifications-techniques.md](docs/05-specifications-techniques.md)
 
-- [x] `id081` — Ajouter le script "deploy" dans package.json _(2026-01-30)_
-  - 📁 Fichiers : `project/package.json`
-  - 🔗 Dépend de : `id080`
-  - 📋 Critères : `npm run deploy` et `npm run deploy -- --dry-run` fonctionnels
+- [ ] `id091` — Créer l'interface VerbosityConfig et les helpers de logging
+  - 📁 Fichiers : `project/src/output/verbosity.ts`
+  - 🔗 Dépend de : `id090`
+  - 📋 Critères : `log(level, msg)`, `logCost(cost)`, `streamResponse(chunk)` selon spécs
+  - 🔗 Référence : [docs/06-codage-guidelines.md](docs/06-codage-guidelines.md)
+
+- [ ] `id092` — Ajouter l'option `--verbosity` aux commandes `run` et `loop`
+  - 📁 Fichiers : `project/src/commands/run.ts`, `project/src/commands/loop.ts`
+  - 🔗 Dépend de : `id091`
+  - 📋 Critères : Option `-V, --verbosity <level>` acceptant 0,1,2,3
 
 ---
 
@@ -34,17 +40,53 @@ _(aucune tâche en cours)_
 
 ## 📋 Backlog
 
-### Phase 2 — Déploiement & polish
+### Phase 3 — Verbosité (suite)
 
-- [ ] `id082` — Créer le fichier CHANGELOG.md initial
-  - 📁 Fichiers : `project/CHANGELOG.md`
-  - 🔗 Dépend de : `id080`
-  - 📋 Critères : Format Keep a Changelog, section Unreleased
+- [ ] `id093` — Implémenter l'affichage du coût (toujours affiché, même nul)
+  - 📁 Fichiers : `project/src/output/verbosity.ts`, `project/src/runner/run.ts`, `project/src/runner/loop.ts`
+  - 🔗 Dépend de : `id092`
+  - 📋 Critères : Format `💰 Coût : X.XX $`, affiché même si 0.00 — RG-018
+
+- [ ] `id094` — Implémenter l'affichage des prompts en texte brut (niveau 3)
+  - 📁 Fichiers : `project/src/output/verbosity.ts`, `project/src/runner/run.ts`, `project/src/runner/loop.ts`
+  - 🔗 Dépend de : `id092`
+  - 📋 Critères : Afficher prompt complet si verbosity >= 3 — RG-020
+
+- [ ] `id095` — Implémenter le streaming temps réel des réponses (niveau 3)
+  - 📁 Fichiers : `project/src/output/verbosity.ts`, `project/src/runner/run.ts`
+  - 🔗 Dépend de : `id092`
+  - 📋 Critères : Tokens affichés dès réception si verbosity >= 3 — RG-019
+
+- [ ] `id096` — Ajouter les tests unitaires pour la verbosité
+  - 📁 Fichiers : `project/tests/unit/verbosity.test.ts`
+  - 🔗 Dépend de : `id095`
+  - 📋 Critères : Couvrir les 4 niveaux, affichage coût, prompts, streaming
+
+### Phase 2 — Déploiement & polish (reste)
 
 - [ ] `id083` — Documenter le processus de release dans README
   - 📁 Fichiers : `project/README.md`
-  - 🔗 Dépend de : `id081`
+  - 🔗 Dépend de : —
   - 📋 Critères : Section "Release" avec instructions pour mainteneurs
+
+---
+
+## ✅ Terminé
+
+### Déploiement NPM
+
+- [x] `id082` — Créer le fichier CHANGELOG.md initial _(2026-01-30)_
+  - 📁 Fichiers : `project/CHANGELOG.md`
+  - 📋 Critères : Format Keep a Changelog, section Unreleased
+
+- [x] `id080` — Créer le script de déploiement `scripts/deploy.js` _(2026-01-30)_
+  - 📁 Fichiers : `project/scripts/deploy.js`
+  - 📋 Critères : Script Node.js (pas PowerShell), vérif branche, tests, build, version check, publish, tag git, changelog
+  - 🔗 Référence : [clarifications/009-deploy-npmjs-normalized.md](clarifications/009-deploy-npmjs-normalized.md)
+
+- [x] `id081` — Ajouter le script "deploy" dans package.json _(2026-01-30)_
+  - 📁 Fichiers : `project/package.json`
+  - 📋 Critères : `npm run deploy` et `npm run deploy -- --dry-run` fonctionnels
 
 ---
 

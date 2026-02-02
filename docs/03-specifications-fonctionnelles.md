@@ -295,10 +295,62 @@ Quand `--artifacts` est activé, écrire un dossier : `.jlgcli/runs/<id>/` conte
 
 ---
 
+### F-007 : Verbosité et traçabilité des commandes
+
+| Attribut      | Valeur       |
+| ------------- | ------------ |
+| Module        | CLI + Output |
+| Priorité      | Must         |
+| Complexité    | Moyenne      |
+| Stories liées | US-013       |
+
+#### Description
+
+Contrôler le niveau de détail des informations affichées lors de l'exécution des commandes `run` et `loop`. Par défaut, le mode **Debug** (niveau 3) est activé pour une traçabilité maximale.
+
+> Référence : [clarification 010-verbosite](../clarifications/010-verbosite-normalized.md)
+
+#### Niveaux de verbosité
+
+| Niveau | Flag            | Comportement                                                              |
+| ------ | --------------- | ------------------------------------------------------------------------- |
+| 0      | `--verbosity=0` | Silencieux — Uniquement le résultat final, pas de traces                  |
+| 1      | `--verbosity=1` | Minimal — Résultat + coût                                                 |
+| 2      | `--verbosity=2` | Normal — Résultat + coût + indicateur de progression                      |
+| 3      | `--verbosity=3` | **Debug (défaut)** — Résultat, coût, prompts complets, réponses en stream |
+
+#### Règles métier
+
+- **RG-017** : le niveau de verbosité par défaut est **3 (Debug)**.
+- **RG-018** : le coût d'utilisation est **toujours affiché**, même s'il est nul (format : `💰 Coût : 0.00 $`).
+- **RG-019** : les réponses sont affichées **en temps réel** (tokens dès réception) au niveau 3.
+- **RG-020** : les prompts envoyés sont affichés **en texte brut complet** au niveau 3.
+- **RG-021** : l'option `--verbosity` surcharge la config par défaut.
+
+#### Comportement attendu
+
+| Entrée                           | Traitement          | Sortie                                |
+| -------------------------------- | ------------------- | ------------------------------------- |
+| `run ./prompt.txt`               | Niveau 3 par défaut | Coût + prompt + stream + résultat     |
+| `run ./prompt.txt --verbosity=0` | Mode silencieux     | Résultat uniquement                   |
+| `run ./prompt.txt --verbosity=1` | Minimal             | Résultat + coût                       |
+| `loop ./task.md`                 | Niveau 3 par défaut | Coût + prompts + stream par itération |
+| `loop ./task.md --verbosity=2`   | Normal              | Résultat + coût + progression         |
+
+#### Cas limites et erreurs
+
+| Cas                       | Comportement attendu                                |
+| ------------------------- | --------------------------------------------------- |
+| Valeur hors [0-3]         | Erreur + message "verbosity doit être 0, 1, 2 ou 3" |
+| Backend sans info de coût | Afficher "Coût : N/A" ou "Coût : 0.00 $"            |
+| Stream interrompu         | Afficher ce qui a été reçu + indicateur d'erreur    |
+
+---
+
 ## Matrice des règles métier
 
 | ID     | Règle                           | Fonctionnalités     | Validation                   |
-| ------ | ------------------------------- | ------------------- | ---------------------------- |
+| ------ | ------------------------------- | ------------------- | ---------------------------- | --- | ------ | ------------------------ | ----- | ---------------------- |
 | RG-001 | Config persistée localement     | F-001               | Tests unitaires + e2e config |
 | RG-002 | Options CLI surchargent config  | F-001, F-003, F-004 | Tests d’intégration          |
 | RG-004 | Diagnostic backends rapide      | F-002               | Tests unitaires adaptateurs  |
@@ -309,7 +361,11 @@ Quand `--artifacts` est activé, écrire un dossier : `.jlgcli/runs/<id>/` conte
 | RG-012 | `timeoutMs` stop                | F-004               | Tests d’intégration          |
 | RG-013 | `noProgressLimit` stop          | F-004               | Tests unitaires “similarité” |
 | RG-014 | Résumé inclut cause d’arrêt     | F-005               | Tests snapshot JSON          |
-| RG-016 | Artifacts: échec si écriture KO | F-006               | Tests d’intégration FS       |
+| RG-016 | Artifacts: échec si écriture KO | F-006               | Tests d’intégration FS       |     | RG-017 | Verbosité par défaut = 3 | F-007 | Tests unitaires output |
+| RG-018 | Coût toujours affiché           | F-007               | Tests unitaires output       |
+| RG-019 | Réponses en temps réel (lvl 3)  | F-007               | Tests d'intégration stream   |
+| RG-020 | Prompts en texte brut (lvl 3)   | F-007               | Tests unitaires output       |
+| RG-021 | --verbosity surcharge config    | F-007               | Tests d'intégration          |
 
 ---
 
@@ -318,4 +374,4 @@ Quand `--artifacts` est activé, écrire un dossier : `.jlgcli/runs/<id>/` conte
 - **Backend** : assistant IA accessible via CLI externe.
 - **Adaptateur** : couche de normalisation pour exécuter un backend.
 - **Completion protocol** : convention d’arrêt (`DONE` ou JSON).
-- **Artifacts** : fichiers produits pour audit/CI/support.
+- **Artifacts** : fichiers produits pour audit/CI/support.- **Verbosité** : niveau de détail des traces affichées (0=silencieux, 1=minimal, 2=normal, 3=debug).

@@ -61,6 +61,48 @@ Notes :
 - Écrire les logs sur **stderr**.
 - Réserver **stdout** à la sortie “résultat” (notamment en mode `--json`).
 
+### Verbosité (niveaux de trace)
+
+> Référence : [clarification 010-verbosite](../clarifications/010-verbosite-normalized.md)
+
+Le niveau de verbosité par défaut est **3 (Debug)**. Respecter les conventions suivantes :
+
+| Niveau | Nom        | Ce qui est affiché                                           |
+| ------ | ---------- | ------------------------------------------------------------ |
+| 0      | Silencieux | Résultat final uniquement                                    |
+| 1      | Minimal    | Résultat + coût                                              |
+| 2      | Normal     | Résultat + coût + indicateur de progression                  |
+| 3      | Debug      | Résultat + coût + prompts complets + réponses stream + infos |
+
+**Conventions d'implémentation** :
+
+```typescript
+// Utiliser une fonction helper pour conditionner l'affichage
+function log(level: number, message: string): void {
+  if (config.verbosity >= level) {
+    console.error(message); // logs sur stderr
+  }
+}
+
+// Affichage du coût (toujours, même si nul)
+function logCost(cost: number): void {
+  console.error(`💰 Coût : ${cost.toFixed(2)} $`);
+}
+
+// Stream des réponses (niveau 3 uniquement)
+function streamResponse(chunk: string): void {
+  if (config.verbosity >= 3) {
+    process.stdout.write(chunk); // temps réel, pas de buffering
+  }
+}
+```
+
+**Règles** :
+
+- Le coût est **toujours affiché** (même `0.00 $`) — RG-018
+- Les prompts sont affichés en **texte brut complet** au niveau 3 — RG-020
+- Les réponses sont streamées en **temps réel** au niveau 3 — RG-019
+
 ### Règles ESLint / Linter
 
 Configuration recommandée (indicative) :
@@ -106,6 +148,7 @@ export function parseCompletion(/* ... */) {
 | Sérialiser `process.env`                   | fuite de secrets                            | whitelister uniquement des clés nécessaires                                                                                |
 | Parser JSON “optimiste”                    | casse si backend écrit du texte autour      | extraire le **dernier JSON valide** ; en mode JSON, si aucun JSON valide n’est extractible → erreur (reco `EX_DATAERR=65`) |
 | Logguer des prompts/sorties sans redaction | risque PII/secrets                          | redaction best-effort + opt-in artifacts                                                                                   |
+| Ignorer le niveau de verbosité             | logs trop verbeux ou trop silencieux        | utiliser `config.verbosity` pour conditionner l'affichage (0-3)                                                            |
 
 ---
 
@@ -128,7 +171,7 @@ Recommandation : erreurs “métier” avec codes stables (alignés avec les spe
 
 - 1 ligne “headline” + 1-2 lignes d’actions (quoi faire ensuite)
 - inclure le backend, la commande, et le hint (ex: “auth requise”)
-- éviter de dump un stack trace en mode normal ; le réserver à `--verbose`
+- éviter de dump un stack trace en mode normal ; le réserver à `--verbosity=3`
 
 ---
 
