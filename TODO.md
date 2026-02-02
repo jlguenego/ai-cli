@@ -1,7 +1,7 @@
 # TODO — @jlguenego/ai-cli
 
-> Dernière mise à jour : 2026-02-02 13:00
-> Progression : 26/34 tâches (76%)
+> Dernière mise à jour : 2026-02-02 18:48
+> Progression : 27/34 tâches (79%)
 
 ## 🎯 Objectif actuel
 
@@ -25,7 +25,7 @@
   - 📋 Critères : `log(level, msg)`, `logCost(cost)`, `streamResponse(chunk)` selon spécs
   - 🔗 Référence : [docs/06-codage-guidelines.md](docs/06-codage-guidelines.md)
 
-- [ ] `id092` — Ajouter l'option `--verbosity` aux commandes `run` et `loop`
+- [x] `id092` — Ajouter l'option `--verbosity` aux commandes `run` et `loop` _(2026-02-02)_
   - 📁 Fichiers : `project/src/commands/run.ts`, `project/src/commands/loop.ts`
   - 🔗 Dépend de : `id091`
   - 📋 Critères : Option `-V, --verbosity <level>` acceptant 0,1,2,3

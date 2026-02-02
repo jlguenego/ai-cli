@@ -93,6 +93,29 @@ describe("Loop Command", () => {
       );
       expect(option).toBeDefined();
     });
+
+    it("should accept --verbosity option with short form -V", () => {
+      const program = new Command();
+      registerLoopCommand(program);
+
+      const loopCmd = program.commands.find((c) => c.name() === "loop");
+      const verbosityOption = loopCmd?.options.find(
+        (o) => o.long === "--verbosity",
+      );
+      expect(verbosityOption).toBeDefined();
+      expect(verbosityOption?.short).toBe("-V");
+    });
+
+    it("should have default verbosity value of 3", () => {
+      const program = new Command();
+      registerLoopCommand(program);
+
+      const loopCmd = program.commands.find((c) => c.name() === "loop");
+      const verbosityOption = loopCmd?.options.find(
+        (o) => o.long === "--verbosity",
+      );
+      expect(verbosityOption?.defaultValue).toBe("3");
+    });
   });
 
   describe("readPromptSource", () => {

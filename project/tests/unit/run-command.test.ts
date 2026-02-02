@@ -58,6 +58,29 @@ describe("Run Command", () => {
       expect(backendOption).toBeDefined();
       expect(backendOption?.short).toBe("-b");
     });
+
+    it("should accept --verbosity option with short form -V", () => {
+      const program = new Command();
+      registerRunCommand(program);
+
+      const runCmd = program.commands.find((c) => c.name() === "run");
+      const verbosityOption = runCmd?.options.find(
+        (o) => o.long === "--verbosity",
+      );
+      expect(verbosityOption).toBeDefined();
+      expect(verbosityOption?.short).toBe("-V");
+    });
+
+    it("should have default verbosity value of 3", () => {
+      const program = new Command();
+      registerRunCommand(program);
+
+      const runCmd = program.commands.find((c) => c.name() === "run");
+      const verbosityOption = runCmd?.options.find(
+        (o) => o.long === "--verbosity",
+      );
+      expect(verbosityOption?.defaultValue).toBe("3");
+    });
   });
 
   describe("readPromptSource", () => {

@@ -20,6 +20,7 @@ const EX_NOINPUT = 66;
 export interface RunCommandOptions {
   backend?: string;
   json?: boolean;
+  verbosity?: string; // Reçu comme string depuis commander, sera parsé en number
 }
 
 /**
@@ -130,6 +131,7 @@ export function registerRunCommand(program: Command): void {
     .command("run <fichier-prompt>")
     .description("Exécute un prompt (fichier) sur un backend IA")
     .option("-b, --backend <id>", "Backend à utiliser (copilot, codex, claude)")
+    .option("-V, --verbosity <level>", "Niveau de verbosité (0-3)", "3")
     .option("--json", "Sortie au format JSON (machine-readable)")
     .action(runAction);
 }

@@ -24,6 +24,7 @@ export interface LoopCommandOptions {
   timeout?: string;
   completionMode?: "marker" | "json";
   json?: boolean;
+  verbosity?: string; // Reçu comme string depuis commander, sera parsé en number
 }
 
 /**
@@ -164,6 +165,7 @@ export function registerLoopCommand(program: Command): void {
       "--completion-mode <mode>",
       "Mode de détection de complétion (marker, json)",
     )
+    .option("-V, --verbosity <level>", "Niveau de verbosité (0-3)", "3")
     .option("--json", "Sortie au format JSON (machine-readable)")
     .action(loopAction);
 }
