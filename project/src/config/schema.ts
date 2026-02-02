@@ -27,6 +27,15 @@ export type BackendId = "copilot" | "codex";
  */
 export type CompletionMode = "marker" | "json";
 
+/**
+ * Niveaux de verbosité pour les commandes CLI
+ * - 0: Silencieux — Résultat final uniquement
+ * - 1: Minimal — Résultat + coût
+ * - 2: Normal — Résultat + coût + indicateur de progression
+ * - 3: Debug — Tout : résultat, coût, prompts, réponses stream, infos techniques
+ */
+export type VerbosityLevel = 0 | 1 | 2 | 3;
+
 // ============================================================================
 // Interfaces de configuration
 // ============================================================================
@@ -45,6 +54,8 @@ export interface UserConfig {
   completionMode?: CompletionMode;
   /** Nombre de répétitions sans progrès avant arrêt */
   noProgressLimit?: number;
+  /** Niveau de verbosité (0=silencieux, 1=minimal, 2=normal, 3=debug) */
+  verbosity?: VerbosityLevel;
 }
 
 /**
@@ -68,6 +79,8 @@ export interface ResolvedConfig {
   completionMode: CompletionMode;
   /** Nombre de répétitions sans progrès avant arrêt */
   noProgressLimit: number;
+  /** Niveau de verbosité */
+  verbosity: VerbosityLevel;
 }
 
 // ============================================================================
@@ -100,6 +113,7 @@ export const DEFAULT_CONFIG: ResolvedConfig = {
   timeoutMs: 300_000, // 5 minutes
   completionMode: "marker",
   noProgressLimit: 3,
+  verbosity: 3,
 };
 
 // ============================================================================
@@ -120,6 +134,13 @@ export const VALID_BACKENDS: readonly BackendId[] = [
 export const VALID_COMPLETION_MODES: readonly CompletionMode[] = [
   "marker",
   "json",
+] as const;
+
+/**
+ * Liste des niveaux de verbosité valides
+ */
+export const VALID_VERBOSITY_LEVELS: readonly VerbosityLevel[] = [
+  0, 1, 2, 3,
 ] as const;
 
 /**
@@ -180,6 +201,16 @@ export function isValidConfig(
     }
   }
 
+  // Valider verbosity si présent
+  if (cfg["verbosity"] !== undefined) {
+    if (
+      typeof cfg["verbosity"] !== "number" ||
+      !VALID_VERBOSITY_LEVELS.includes(cfg["verbosity"] as VerbosityLevel)
+    ) {
+      return false;
+    }
+  }
+
   return true;
 }
 
@@ -192,6 +223,7 @@ export const CONFIG_KEYS = [
   "timeoutMs",
   "completionMode",
   "noProgressLimit",
+  "verbosity",
 ] as const;
 
 export type ConfigKey = (typeof CONFIG_KEYS)[number];

@@ -13,7 +13,7 @@
 
 ## 🔥 Priorité haute (Quick Wins / Démontrable)
 
-- [ ] `id090` — Ajouter le champ `verbosity` dans le schéma de configuration
+- [x] `id090` — Ajouter le champ `verbosity` dans le schéma de configuration _(2026-02-02)_
   - 📁 Fichiers : `project/src/config/schema.ts`
   - 🔗 Dépend de : —
   - 📋 Critères : Type `verbosity: 0 | 1 | 2 | 3`, défaut 3, validation

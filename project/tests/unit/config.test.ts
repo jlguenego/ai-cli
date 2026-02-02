@@ -6,6 +6,7 @@ import {
   isValidConfig,
   VALID_BACKENDS,
   VALID_COMPLETION_MODES,
+  VALID_VERBOSITY_LEVELS,
   CONFIG_KEYS,
   type ResolvedConfig,
 } from "../../src/config/schema.js";
@@ -19,6 +20,7 @@ describe("config/schema", () => {
         "timeoutMs",
         "completionMode",
         "noProgressLimit",
+        "verbosity",
       ];
 
       for (const key of requiredKeys) {
@@ -44,6 +46,15 @@ describe("config/schema", () => {
 
     it("should have a valid backend", () => {
       expect(VALID_BACKENDS).toContain(DEFAULT_CONFIG.backend);
+    });
+
+    it("should have verbosity equal to 3 (debug mode)", () => {
+      expect(DEFAULT_CONFIG.verbosity).toBe(3);
+    });
+
+    it("should have verbosity in valid range [0-3]", () => {
+      expect(DEFAULT_CONFIG.verbosity).toBeGreaterThanOrEqual(0);
+      expect(DEFAULT_CONFIG.verbosity).toBeLessThanOrEqual(3);
     });
   });
 
@@ -74,6 +85,15 @@ describe("config/schema", () => {
       expect(CONFIG_KEYS).toContain("timeoutMs");
       expect(CONFIG_KEYS).toContain("completionMode");
       expect(CONFIG_KEYS).toContain("noProgressLimit");
+      expect(CONFIG_KEYS).toContain("verbosity");
+    });
+
+    it("should define VALID_VERBOSITY_LEVELS", () => {
+      expect(VALID_VERBOSITY_LEVELS).toContain(0);
+      expect(VALID_VERBOSITY_LEVELS).toContain(1);
+      expect(VALID_VERBOSITY_LEVELS).toContain(2);
+      expect(VALID_VERBOSITY_LEVELS).toContain(3);
+      expect(VALID_VERBOSITY_LEVELS).toHaveLength(4);
     });
   });
 
@@ -85,6 +105,7 @@ describe("config/schema", () => {
         timeoutMs: 60000,
         completionMode: "marker",
         noProgressLimit: 3,
+        verbosity: 3,
       };
       expect(isValidConfig(config)).toBe(true);
     });
@@ -93,6 +114,7 @@ describe("config/schema", () => {
       expect(isValidConfig({ backend: "codex" })).toBe(true);
       expect(isValidConfig({ maxIterations: 5 })).toBe(true);
       expect(isValidConfig({ completionMode: "json" })).toBe(true);
+      expect(isValidConfig({ verbosity: 2 })).toBe(true);
     });
 
     it("should return true for an empty object", () => {
@@ -139,6 +161,20 @@ describe("config/schema", () => {
 
     it("should return true for noProgressLimit = 0", () => {
       expect(isValidConfig({ noProgressLimit: 0 })).toBe(true);
+    });
+
+    it("should return true for valid verbosity values", () => {
+      expect(isValidConfig({ verbosity: 0 })).toBe(true);
+      expect(isValidConfig({ verbosity: 1 })).toBe(true);
+      expect(isValidConfig({ verbosity: 2 })).toBe(true);
+      expect(isValidConfig({ verbosity: 3 })).toBe(true);
+    });
+
+    it("should return false for invalid verbosity values", () => {
+      expect(isValidConfig({ verbosity: -1 })).toBe(false);
+      expect(isValidConfig({ verbosity: 4 })).toBe(false);
+      expect(isValidConfig({ verbosity: "high" })).toBe(false);
+      expect(isValidConfig({ verbosity: null })).toBe(false);
     });
   });
 });
