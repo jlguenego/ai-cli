@@ -3,7 +3,7 @@ import type {
   Adapter,
   AdapterAvailability,
   AdapterRunOnceArgs,
-  AdapterRunOnceResult,
+  AdapterRunOnceResult
 } from "./types.js";
 
 const CODEX_CMD = "codex";
@@ -19,13 +19,13 @@ function isEnoent(error: unknown): boolean {
 
 function looksUnauthenticated(output: string): boolean {
   return /\b(unauthori[sz]ed|forbidden|login|log in|not\s+logged|auth(entication)?|api\s*key|openai_api_key|token)\b/i.test(
-    output,
+    output
   );
 }
 
 function looksMissingBinary(output: string): boolean {
   return /\b(command\s+not\s+found|not\s+recognized\s+as\s+an\s+internal\s+or\s+external\s+command|no\s+such\s+file\s+or\s+directory|cannot\s+find\s+the\s+file)\b/i.test(
-    output,
+    output
   );
 }
 
@@ -43,20 +43,20 @@ async function tryExec(
     env?: Record<string, string | undefined>;
     timeoutMs?: number;
     input?: string;
-  },
+  }
 ): Promise<ExecResult> {
   const result = await execa(command, args, {
     reject: false,
     cwd: opts.cwd,
     env: opts.env,
     timeout: opts.timeoutMs,
-    input: opts.input,
+    input: opts.input
   });
 
   return {
     exitCode: result.exitCode ?? 1,
     stdout: result.stdout ?? "",
-    stderr: result.stderr ?? "",
+    stderr: result.stderr ?? ""
   };
 }
 
@@ -87,7 +87,7 @@ async function detectAvailability(): Promise<
     // considérer le backend présent ("available") et exposer le diagnostic.
     return {
       kind: "available",
-      details: combined || `exitCode=${r.exitCode}`,
+      details: combined || `exitCode=${r.exitCode}`
     };
   } catch (error) {
     if (isEnoent(error)) {
@@ -123,25 +123,47 @@ export class CodexAdapter implements Adapter {
     const env = { ...process.env, ...args.env };
 
     if (detected.kind === "available") {
-      // One-shot best-effort : envoyer le prompt via stdin.
-      const r = await tryExec(CODEX_CMD, [], {
+      // Créer le subprocess avec streaming et input stdin
+      const subprocess = execa(CODEX_CMD, [], {
         cwd: args.cwd,
         env,
-        timeoutMs: args.timeoutMs,
-        input: args.prompt,
+        timeout: args.timeoutMs,
+        reject: false,
+        input: args.prompt
       });
 
+      let stdout = "";
+      let stderr = "";
+
+      if (subprocess.stdout) {
+        subprocess.stdout.on("data", (data: Buffer) => {
+          const chunk = data.toString();
+          stdout += chunk;
+          if (args.onChunk) {
+            args.onChunk(chunk);
+          }
+        });
+      }
+
+      if (subprocess.stderr) {
+        subprocess.stderr.on("data", (data: Buffer) => {
+          stderr += data.toString();
+        });
+      }
+
+      const result = await subprocess;
+
       return {
-        exitCode: r.exitCode,
-        text: r.stdout.trim() ? r.stdout : r.stderr,
-        raw: r,
+        exitCode: result.exitCode ?? 1,
+        text: stdout.trim() || stderr,
+        raw: { stdout, stderr, exitCode: result.exitCode }
       };
     }
 
     return {
       exitCode: detected.kind === "unauthenticated" ? 6 : 2,
       text: detected.details ?? "Backend codex indisponible",
-      raw: detected,
+      raw: detected
     };
   }
 }

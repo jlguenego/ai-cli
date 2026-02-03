@@ -16,6 +16,8 @@ export interface AdapterRunOnceArgs {
   cwd: string;
   env?: Record<string, string | undefined>;
   timeoutMs?: number;
+  /** Callback appelé pour chaque chunk reçu en streaming (optionnel) */
+  onChunk?: (chunk: string) => void;
 }
 
 export interface AdapterRunOnceResult {

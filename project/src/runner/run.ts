@@ -3,7 +3,8 @@ import { resolveConfig } from "../config/loader.js";
 import {
   createVerbosityConfig,
   logCost,
-  logPrompt
+  logPrompt,
+  streamResponseChunk
 } from "../output/verbosity.js";
 import type { VerbosityLevel } from "../config/schema.js";
 import type { RunOptions, RunResult, RunStatus } from "./types.js";
@@ -108,13 +109,24 @@ export async function runOnce(options: RunOptions): Promise<RunResult> {
   // Afficher le prompt si verbosity >= 3 (RG-020)
   logPrompt(verbosityConfig, options.prompt);
 
-  // Exécuter le prompt
+  // Créer le callback de streaming si verbosity >= 3
+  const onChunk = verbosityConfig.streamResponse
+    ? (chunk: string) => streamResponseChunk(verbosityConfig, chunk)
+    : undefined;
+
+  // Exécuter le prompt avec streaming
   const result = await adapter.runOnce({
     prompt: options.prompt,
     cwd,
     env: options.env,
-    timeoutMs: options.timeoutMs
+    timeoutMs: options.timeoutMs,
+    onChunk
   });
+
+  // Ajouter un saut de ligne après le stream si on a streamé
+  if (verbosityConfig.streamResponse) {
+    process.stdout.write("\n");
+  }
 
   // Afficher le coût (RG-018)
   logCost(verbosityConfig, cost);

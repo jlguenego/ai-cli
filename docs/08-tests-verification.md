@@ -82,7 +82,7 @@ describe("[Module/Fonction]", () => {
 ```mermaid
 flowchart LR
   A[jlgcli backends] --> B[Afficher statuts]
-  B --> C[jlgcli loop "..." --max-iterations 3]
+  B --> C[jlgcli loop ./task.md --max-iterations 3]
   C --> D[Résumé final + exit code]
 ```
 

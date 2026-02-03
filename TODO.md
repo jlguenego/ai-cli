@@ -52,8 +52,8 @@ _(aucune tâche en cours)_
   - 🔗 Dépend de : `id092`
   - 📋 Critères : Afficher prompt complet si verbosity >= 3 — RG-020
 
-- [ ] `id095` — Implémenter le streaming temps réel des réponses (niveau 3)
-  - 📁 Fichiers : `project/src/output/verbosity.ts`, `project/src/runner/run.ts`
+- [x] `id095` — Implémenter le streaming temps réel des réponses (niveau 3) _(2026-02-03)_
+  - 📁 Fichiers : `project/src/adapters/types.ts`, `project/src/adapters/copilot.ts`, `project/src/adapters/codex.ts`, `project/src/runner/run.ts`
   - 🔗 Dépend de : `id092`
   - 📋 Critères : Tokens affichés dès réception si verbosity >= 3 — RG-019
 

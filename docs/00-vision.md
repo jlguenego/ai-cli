@@ -100,8 +100,8 @@ Un orchestrateur CLI unique (`jlgcli`) capable de piloter différents backends I
 
 - `jlgcli --version` fonctionne (installation validée, code retour 0).
 - `jlgcli backends` affiche la liste des backends supportés + statut `available|missing|unauthenticated|unsupported`.
-- `jlgcli run <prompt>` retourne une sortie et un code retour cohérent.
-- `jlgcli loop <prompt>` s’arrête :
+- `jlgcli run <fichier>` retourne une sortie et un code retour cohérent (le prompt est lu depuis un fichier, cf. clarification 008).
+- `jlgcli loop <fichier>` s'arrête :
   - dès qu’un `DONE` (mode marker) ou `{"status":"done"}` (mode JSON) est détecté ;
   - sinon à `maxIterations` / `timeoutMs` avec un échec contrôlé et un résumé.
   - en mode JSON, si aucun JSON valide n’est extractible : échec contrôlé (recommandation : `EX_DATAERR=65`).

@@ -3,7 +3,7 @@ import type {
   Adapter,
   AdapterAvailability,
   AdapterRunOnceArgs,
-  AdapterRunOnceResult,
+  AdapterRunOnceResult
 } from "./types.js";
 
 const COPILOT_CMD = "copilot";
@@ -19,7 +19,7 @@ function isEnoent(error: unknown): boolean {
 
 function looksUnauthenticated(output: string): boolean {
   return /\b(auth(entication)?|login|log in|not\s+logged|unauthori[sz]ed|token)\b/i.test(
-    output,
+    output
   );
 }
 
@@ -36,19 +36,19 @@ async function tryExec(
     cwd?: string;
     env?: Record<string, string | undefined>;
     timeoutMs?: number;
-  },
+  }
 ): Promise<ExecResult> {
   const result = await execa(command, args, {
     reject: false,
     cwd: opts.cwd,
     env: opts.env,
-    timeout: opts.timeoutMs,
+    timeout: opts.timeoutMs
   });
 
   return {
     exitCode: result.exitCode ?? 1,
     stdout: result.stdout ?? "",
-    stderr: result.stderr ?? "",
+    stderr: result.stderr ?? ""
   };
 }
 
@@ -71,13 +71,13 @@ async function detectBackend(): Promise<
 
     return {
       kind: "copilot",
-      details: combined || `exitCode=${r.exitCode}`,
+      details: combined || `exitCode=${r.exitCode}`
     };
   } catch (error) {
     if (isEnoent(error)) {
       return {
         kind: "missing",
-        details: "Commande introuvable: copilot",
+        details: "Commande introuvable: copilot"
       };
     }
     const message = error instanceof Error ? error.message : String(error);
@@ -118,19 +118,43 @@ export class CopilotAdapter implements Adapter {
         args.prompt,
         "-s",
         "--allow-all-tools",
-        "--allow-all-paths",
+        "--allow-all-paths"
       ];
 
-      const r = await tryExec(COPILOT_CMD, copilotArgs, {
+      // Créer le subprocess avec streaming
+      const subprocess = execa(COPILOT_CMD, copilotArgs, {
         cwd: args.cwd,
         env,
-        timeoutMs: args.timeoutMs,
+        timeout: args.timeoutMs,
+        reject: false
       });
 
+      // Collecter le stdout complet et streamer si callback fourni
+      let stdout = "";
+      let stderr = "";
+
+      if (subprocess.stdout) {
+        subprocess.stdout.on("data", (data: Buffer) => {
+          const chunk = data.toString();
+          stdout += chunk;
+          if (args.onChunk) {
+            args.onChunk(chunk);
+          }
+        });
+      }
+
+      if (subprocess.stderr) {
+        subprocess.stderr.on("data", (data: Buffer) => {
+          stderr += data.toString();
+        });
+      }
+
+      const result = await subprocess;
+
       return {
-        exitCode: r.exitCode,
-        text: r.stdout.trim() ? r.stdout : r.stderr,
-        raw: r,
+        exitCode: result.exitCode ?? 1,
+        text: stdout.trim() || stderr,
+        raw: { stdout, stderr, exitCode: result.exitCode }
       };
     }
 
@@ -138,7 +162,7 @@ export class CopilotAdapter implements Adapter {
     return {
       exitCode: detected.kind === "unauthenticated" ? 6 : 2,
       text: detected.details ?? "Backend copilot indisponible",
-      raw: detected,
+      raw: detected
     };
   }
 }

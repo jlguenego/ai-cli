@@ -77,7 +77,7 @@ L’utilisateur veut exécuter une tâche longue (ex. “réorganiser une base d
 
 | Étape | Action                                   | Pensée                                              | Émotion   | Opportunité                       |
 | ----- | ---------------------------------------- | --------------------------------------------------- | --------- | --------------------------------- |
-| 1     | Lance `jlgcli loop "…"`                  | “Je veux que ça boucle jusqu’à la fin.”             | Motivé    | Protocole de complétion explicite |
+| 1     | Lance `jlgcli loop ./task.md`            | "Je veux que ça boucle jusqu'à la fin."             | Motivé    | Protocole de complétion explicite |
 | 2     | Observe la progression (logs)            | “Est-ce que ça progresse ?”                         | Vigilant  | Indicateurs d’itération + temps   |
 | 3     | Le run s’arrête sur `DONE` / JSON `done` | “Parfait, c’est terminé.”                           | Satisfait | Signal de fin robuste             |
 | 4     | Consulte le résumé final                 | “Combien d’itérations, quel backend, quel statut ?” | Clair     | Résumé lisible + option `--json`  |
@@ -107,11 +107,11 @@ L’utilisateur souhaite intégrer `jlgcli` dans un script (CI/CD ou automation 
 
 #### Étapes
 
-| Étape | Action                        | Pensée                         | Émotion     | Opportunité                |
-| ----- | ----------------------------- | ------------------------------ | ----------- | -------------------------- |
-| 1     | Lance `jlgcli run ... --json` | “Je veux parser la sortie.”    | Pragmatique | Contrat JSON stable        |
-| 2     | Évalue le code retour         | “Succès / indispo / timeout ?” | Confiant    | Codes de sortie documentés |
-| 3     | Archive le résumé             | “Je garde une trace du run.”   | Serein      | Artifacts + logs contrôlés |
+| Étape | Action                                 | Pensée                         | Émotion     | Opportunité                |
+| ----- | -------------------------------------- | ------------------------------ | ----------- | -------------------------- |
+| 1     | Lance `jlgcli run ./prompt.txt --json` | "Je veux parser la sortie."    | Pragmatique | Contrat JSON stable        |
+| 2     | Évalue le code retour                  | “Succès / indispo / timeout ?” | Confiant    | Codes de sortie documentés |
+| 3     | Archive le résumé                      | “Je garde une trace du run.”   | Serein      | Artifacts + logs contrôlés |
 
 #### Diagramme de parcours (OBLIGATOIRE)
 
