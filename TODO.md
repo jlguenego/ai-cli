@@ -47,7 +47,7 @@ _(aucune tâche en cours)_
   - 🔗 Dépend de : `id092`
   - 📋 Critères : Format `💰 Coût : X.XX $`, affiché même si 0.00 — RG-018
 
-- [ ] `id094` — Implémenter l'affichage des prompts en texte brut (niveau 3)
+- [x] `id094` — Implémenter l'affichage des prompts en texte brut (niveau 3) _(2026-02-03)_
   - 📁 Fichiers : `project/src/output/verbosity.ts`, `project/src/runner/run.ts`, `project/src/runner/loop.ts`
   - 🔗 Dépend de : `id092`
   - 📋 Critères : Afficher prompt complet si verbosity >= 3 — RG-020

@@ -1,13 +1,17 @@
 import { tryGetAdapterById } from "../adapters/registry.js";
 import { resolveConfig } from "../config/loader.js";
 import { parseCompletion } from "../completion/index.js";
-import { createVerbosityConfig, logCost } from "../output/verbosity.js";
+import {
+  createVerbosityConfig,
+  logCost,
+  logPrompt
+} from "../output/verbosity.js";
 import type { CompletionMode, VerbosityLevel } from "../config/schema.js";
 import type {
   LoopOptions,
   LoopResult,
   LoopStatus,
-  TranscriptEntry,
+  TranscriptEntry
 } from "./types.js";
 
 // Exit codes conformes à clarifications/003
@@ -39,7 +43,7 @@ async function resolveLoopOptions(options: LoopOptions): Promise<{
     timeoutMs: options.timeoutMs ?? config.timeoutMs,
     completionMode: options.completionMode ?? config.completionMode,
     noProgressLimit: options.noProgressLimit ?? config.noProgressLimit,
-    cwd: options.cwd ?? process.cwd(),
+    cwd: options.cwd ?? process.cwd()
   };
 }
 
@@ -47,7 +51,7 @@ async function resolveLoopOptions(options: LoopOptions): Promise<{
  * Mappe le statut d'availability vers un exit code
  */
 function exitCodeForAvailability(
-  status: "missing" | "unauthenticated" | "unsupported",
+  status: "missing" | "unauthenticated" | "unsupported"
 ): number {
   switch (status) {
     case "missing":
@@ -63,7 +67,7 @@ function exitCodeForAvailability(
  * Mappe le statut d'availability vers un LoopStatus
  */
 function loopStatusForAvailability(
-  status: "missing" | "unauthenticated" | "unsupported",
+  status: "missing" | "unauthenticated" | "unsupported"
 ): LoopStatus {
   switch (status) {
     case "missing":
@@ -97,7 +101,7 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
     timeoutMs,
     completionMode,
     noProgressLimit,
-    cwd,
+    cwd
   } = await resolveLoopOptions(options);
 
   // Créer la config de verbosité
@@ -112,7 +116,7 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
     status: LoopStatus,
     exitCode: number,
     text: string,
-    opts?: { summary?: string; details?: string },
+    opts?: { summary?: string; details?: string }
   ): LoopResult => {
     logCost(verbosityConfig, totalCost);
     return {
@@ -125,7 +129,7 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
       transcript,
       cost: totalCost,
       summary: opts?.summary,
-      details: opts?.details,
+      details: opts?.details
     };
   };
 
@@ -138,8 +142,8 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
       EXIT_USAGE,
       `Backend inconnu: ${backendId}. Les backends supportés sont: copilot, codex, claude`,
       {
-        details: `Backend inconnu: ${backendId}. Les backends supportés sont: copilot, codex, claude`,
-      },
+        details: `Backend inconnu: ${backendId}. Les backends supportés sont: copilot, codex, claude`
+      }
     );
   }
 
@@ -153,7 +157,7 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
       loopStatusForAvailability(availability.status),
       exitCodeForAvailability(availability.status),
       details,
-      { details },
+      { details }
     );
   }
 
@@ -172,7 +176,7 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
     const elapsed = Date.now() - startTime;
     if (elapsed >= timeoutMs) {
       return createResultWithCost("timeout", EXIT_TIMEOUT, lastResponse, {
-        details: `Timeout global atteint après ${elapsed}ms`,
+        details: `Timeout global atteint après ${elapsed}ms`
       });
     }
 
@@ -182,12 +186,15 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
     const iterationStart = Date.now();
     const iterationStartIso = new Date(iterationStart).toISOString();
 
+    // Afficher le prompt si verbosity >= 3 (RG-020)
+    logPrompt(verbosityConfig, currentPrompt);
+
     // Exécuter le prompt sur le backend
     const result = await adapter.runOnce({
       prompt: currentPrompt,
       cwd,
       env: options.env,
-      timeoutMs: remainingTimeout,
+      timeoutMs: remainingTimeout
     });
 
     const iterationDuration = Date.now() - iterationStart;
@@ -199,7 +206,7 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
       startedAt: iterationStartIso,
       prompt: currentPrompt,
       response: result.text,
-      durationMs: iterationDuration,
+      durationMs: iterationDuration
     };
 
     transcript.push(entry);
@@ -224,8 +231,8 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
           EXIT_NO_PROGRESS,
           result.text,
           {
-            details: `Arrêt après ${consecutiveIdenticalCount} réponses identiques consécutives`,
-          },
+            details: `Arrêt après ${consecutiveIdenticalCount} réponses identiques consécutives`
+          }
         );
       }
     }
@@ -233,7 +240,7 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
     // Vérifier si le backend a échoué
     if (result.exitCode !== 0) {
       return createResultWithCost("error", result.exitCode, result.text, {
-        details: `Backend a retourné exit code ${result.exitCode}`,
+        details: `Backend a retourné exit code ${result.exitCode}`
       });
     }
 
@@ -248,7 +255,7 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
       }
 
       return createResultWithCost("done", EXIT_SUCCESS, result.text, {
-        summary,
+        summary
       });
     }
 
@@ -257,7 +264,7 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
       const errorMessage =
         "error" in completion ? completion.error : "invalid-json";
       return createResultWithCost("invalid-json", EXIT_DATAERR, result.text, {
-        details: errorMessage,
+        details: errorMessage
       });
     }
 
@@ -274,6 +281,6 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
     "max-iterations",
     EXIT_MAX_ITERATIONS,
     lastResponse,
-    { details: `Limite de ${maxIterations} itérations atteinte` },
+    { details: `Limite de ${maxIterations} itérations atteinte` }
   );
 }

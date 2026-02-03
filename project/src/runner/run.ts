@@ -1,6 +1,10 @@
 import { tryGetAdapterById } from "../adapters/registry.js";
 import { resolveConfig } from "../config/loader.js";
-import { createVerbosityConfig, logCost } from "../output/verbosity.js";
+import {
+  createVerbosityConfig,
+  logCost,
+  logPrompt
+} from "../output/verbosity.js";
 import type { VerbosityLevel } from "../config/schema.js";
 import type { RunOptions, RunResult, RunStatus } from "./types.js";
 
@@ -26,7 +30,7 @@ async function resolveBackendId(explicitBackend?: string): Promise<string> {
  * Mappe le statut d'availability vers un exit code
  */
 function exitCodeForAvailability(
-  status: "missing" | "unauthenticated" | "unsupported",
+  status: "missing" | "unauthenticated" | "unsupported"
 ): number {
   switch (status) {
     case "missing":
@@ -42,7 +46,7 @@ function exitCodeForAvailability(
  * Mappe le statut d'availability vers un RunStatus
  */
 function runStatusForAvailability(
-  status: "missing" | "unauthenticated" | "unsupported",
+  status: "missing" | "unauthenticated" | "unsupported"
 ): RunStatus {
   switch (status) {
     case "missing":
@@ -81,7 +85,7 @@ export async function runOnce(options: RunOptions): Promise<RunResult> {
       status: "backend-unknown",
       durationMs: Date.now() - startTime,
       details: `Les backends supportés sont: copilot, codex, claude`,
-      cost,
+      cost
     };
   }
 
@@ -97,16 +101,19 @@ export async function runOnce(options: RunOptions): Promise<RunResult> {
       status: runStatusForAvailability(availability.status),
       durationMs: Date.now() - startTime,
       details: availability.details,
-      cost,
+      cost
     };
   }
+
+  // Afficher le prompt si verbosity >= 3 (RG-020)
+  logPrompt(verbosityConfig, options.prompt);
 
   // Exécuter le prompt
   const result = await adapter.runOnce({
     prompt: options.prompt,
     cwd,
     env: options.env,
-    timeoutMs: options.timeoutMs,
+    timeoutMs: options.timeoutMs
   });
 
   // Afficher le coût (RG-018)
@@ -118,6 +125,6 @@ export async function runOnce(options: RunOptions): Promise<RunResult> {
     backend: backendId,
     status: result.exitCode === 0 ? "success" : "error",
     durationMs: Date.now() - startTime,
-    cost,
+    cost
   };
 }
